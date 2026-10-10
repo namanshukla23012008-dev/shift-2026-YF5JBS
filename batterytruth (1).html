@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="hi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BatteryTruth AI</title>
+<style>
+:root{--bg:#f4f7f6;--card:#fff;--ink:#0b1d33;--mut:#51657a;--navy:#0b1d33;--g:#12c26b;--gd:#0a8f4e;--red:#c62828;--line:#d8e1e8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#07121f;--card:#10243b;--ink:#eef5fa;--mut:#9db2c6;--line:#243b55}}
+:root[data-theme="dark"]{--bg:#07121f;--card:#10243b;--ink:#eef5fa;--mut:#9db2c6;--line:#243b55}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:17px/1.5 system-ui,"Noto Sans Devanagari",sans-serif;padding-bottom:84px}
+header{background:var(--navy);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+header b{font-size:20px}header b span{color:var(--g)}header small{margin-left:auto;opacity:.8;font-size:13px}
+main{max-width:760px;margin:0 auto;padding:16px}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--navy);display:flex;padding-bottom:env(safe-area-inset-bottom,0px);z-index:6}
+nav button{flex:1;background:none;border:0;color:#b9c8d6;padding:10px 2px;font:600 13px system-ui;min-height:56px;cursor:pointer}
+nav button .i{display:block;font-size:22px}nav button[aria-current=page]{color:var(--g)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--g);outline-offset:2px}
+.hero{background:linear-gradient(135deg,#0b1d33,#103a4a);color:#fff;border-radius:18px;padding:24px 20px;margin-bottom:16px}
+.hero h1{margin:0 0 6px;font-size:28px;line-height:1.2}.hero p{margin:0 0 16px;color:#cfe0ea}
+.btn{background:var(--g);color:#032;border:0;border-radius:12px;padding:14px 18px;font:700 17px system-ui;min-height:52px;cursor:pointer}
+.btn.alt{background:transparent;color:inherit;border:2px solid currentColor}.btn.red{background:var(--red);color:#fff}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+h2{margin:0 0 10px;font-size:22px}h3{margin:0 0 6px;font-size:18px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}.stat b{font-size:26px;display:block}.stat span{color:var(--mut);font-size:14px}
+label{display:block;font-weight:600;margin:10px 0 4px}
+input,select,textarea{width:100%;padding:12px;border:1.5px solid var(--line);border-radius:10px;font:inherit;background:var(--card);color:var(--ink);min-height:48px}
+.tag{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;background:#fff3cd;color:#664d03}
+.note{color:var(--mut);font-size:14px}.err{color:var(--red);font-weight:600}
+.row{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.row button{background:none;border:0;color:var(--red);font:600 14px system-ui;cursor:pointer;min-height:44px}
+.mic{width:120px;height:120px;border-radius:50%;border:0;background:var(--g);font-size:48px;cursor:pointer;display:block;margin:10px auto;box-shadow:0 0 0 0 rgba(18,194,107,.5)}
+.mic.on{animation:p 1.2s infinite;background:#ffb300}@keyframes p{70%{box-shadow:0 0 0 24px rgba(18,194,107,0)}}
+@media(prefers-reduced-motion:reduce){.mic.on{animation:none}}
+.msg{padding:10px 12px;border-radius:12px;margin:8px 0;max-width:92%}.u{background:#dff7ea;color:#032;margin-left:auto}.a{background:var(--card);border:1px solid var(--line)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.chips button{border:1.5px solid var(--g);background:none;color:var(--ink);border-radius:99px;padding:10px 14px;font:600 15px system-ui;min-height:44px;cursor:pointer}
+.warn{background:#fff3cd;color:#664d03;border-radius:10px;padding:10px 12px;font-size:15px}
+.emg{background:#fde8e8;color:#7a1010;border:2px solid var(--red);border-radius:12px;padding:14px}
+section[hidden]{display:none}
+.cells{display:flex;gap:4px;height:46px;border:3px solid var(--ink);border-radius:10px;padding:4px;position:relative;margin:10px 12px 14px 0}.cells:after{content:"";position:absolute;right:-10px;top:11px;width:6px;height:16px;background:var(--ink);border-radius:0 3px 3px 0}.cells b{flex:1;border-radius:3px;background:var(--line)}.cells b.on{background:var(--g)}.cells b.on.mid{background:#ffb300}.cells b.on.lo{background:var(--red)}
+.big{font-size:46px;font-weight:800;line-height:1;margin:8px 0}.ev{font-style:normal;font-size:12px;font-weight:700;padding:2px 8px;border-radius:6px;display:inline-block;margin-top:4px}.ev.u{background:#dff7ea;color:#064}.ev.c{background:#dbeafe;color:#124}.ev.e{background:#fff3cd;color:#664d03}.ev.s{background:#e6e6e6;color:#333}input[type=range]{padding:0;accent-color:#12c26b}.stat{border-left:5px solid var(--g)}header{flex-wrap:wrap}header small{font-size:12px}nav{overflow-x:auto}nav button{flex:0 0 78px}ol{padding-left:20px}.cards2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.cards2 .card{margin:0}
+@media(min-width:900px){nav{top:60px;bottom:0;right:auto;width:200px;flex-direction:column;overflow-y:auto}nav button{flex:none;text-align:left;display:flex;gap:10px;align-items:center;padding:10px 14px;min-height:48px}nav button .i{display:inline;font-size:20px}nav button[aria-current=page]{background:#12304a}main{margin-left:220px}body{padding-bottom:0}}
+@media print{nav,header,.btn{display:none!important}main{margin:0}}
+svg{width:100%;height:auto}
+</style></head><body>
+<header><b>Battery<span>Truth</span> AI</b><small>Data sirf is phone mein</small><select id="lang" aria-label="Language / भाषा" style="width:auto;min-height:36px;padding:4px 8px;margin-left:8px"><option value="hg">Hinglish</option><option value="hi">हिन्दी</option><option value="en">English</option><option value="bn">বাংলা</option><option value="mr">मराठी</option></select></header>
+<main>
+
+<section id="home">
+<h2>Driver Dashboard</h2>
+<div class="card" id="gauge"></div><div class="grid" id="stats"></div><div id="dashx" style="margin-top:14px"></div>
+<div class="card" style="margin-top:14px"><h3>Range trend (km per 100% charge)</h3><div id="chart"></div><p class="note" id="chartnote"></p></div>
+<div class="card"><h3>Gaadi ki jaankari</h3>
+<label for="chem">Battery type</label><select id="chem"><option value="">Pata nahi</option><option>Lead-acid</option><option>Lithium-ion</option></select>
+<label for="cap">Battery capacity (kWh, agar pata ho)</label><input id="cap" type="number" min="0" step="0.1" inputmode="decimal">
+<label for="tariff">Bijli ka rate (₹ per unit)</label><input id="tariff" type="number" min="0" step="0.1" inputmode="decimal">
+<p class="note">Battery health (SOH) sirf charge % se nahi nikalti. Asli capacity ke liye professional test chahiye.</p></div>
+</section>
+
+<section id="trips" hidden>
+<h2>Trip aur kharcha</h2>
+<form class="card" id="tf" novalidate>
+<div class="grid"><div><label for="o1">Shuru odometer (km)</label><input id="o1" type="number" min="0" inputmode="decimal"></div>
+<div><label for="o2">Ant odometer (km)</label><input id="o2" type="number" min="0" inputmode="decimal"></div>
+<div><label for="c1">Shuru charge %</label><input id="c1" type="number" min="0" max="100" inputmode="numeric"></div>
+<div><label for="c2">Ant charge %</label><input id="c2" type="number" min="0" max="100" inputmode="numeric"></div></div>
+<label for="cost">Charging kharcha (₹, optional)</label><input id="cost" type="number" min="0" inputmode="decimal">
+<label for="nt">Note / dikkat</label><input id="nt" type="text" maxlength="120">
+<p class="err" id="terr" role="alert"></p>
+<button class="btn" type="submit">Trip Save Karein</button></form>
+<div class="card"><div id="tl"></div>
+<button class="btn alt" id="rst" style="margin-top:10px;color:var(--ink)">Sample data wapas laayein</button></div>
+</section>
+
+<section id="range" hidden>
+<h2>Range Predictor</h2>
+<div class="card"><label for="rb">Pichhle hisaab se poore charge pe km</label><input id="rb" type="number" min="1" inputmode="decimal" value="80">
+<label for="rp">Abhi charge %</label><input id="rp" type="number" min="0" max="100" inputmode="numeric" value="60">
+<label for="rl">Sawari / saman</label><select id="rl"><option value="1">Halka (1-2 sawari)</option><option value="0.9" selected>Normal (3-4 sawari)</option><option value="0.8">Bhaari / overload</option></select>
+<label for="rr">Sadak</label><select id="rr"><option value="1">Achhi sadak</option><option value="0.9" selected>Kuch gadde</option><option value="0.8">Kharab / chadhai</option></select>
+<button class="btn" id="rgo" style="margin-top:12px">Range Nikaalein</button>
+<div id="rout" style="margin-top:12px"></div></div></section>
+
+<section id="saathi" hidden>
+<h2>Saathi AI</h2>
+<p class="warn">⚠ Gaadi chalate waqt phone use na karein. Safe jagah rukkar poochhein.</p>
+<button class="mic" id="mic" aria-label="Bolna shuru karein">🎙</button>
+<p class="note" id="mstat" style="text-align:center" aria-live="polite">Mic dabaakar bolein</p>
+<div style="text-align:center"><button class="btn alt" id="rep" style="color:var(--ink)">🔁 Phir sunao</button> <button class="btn alt" id="stp" style="color:var(--ink)">⏹ Chup</button></div>
+<div class="chips" id="chips"></div>
+<div class="grid" style="grid-template-columns:1fr auto"><input id="ti" aria-label="Sawal likhein" placeholder="Ya yahan likhein…"><button class="btn" id="ts">Bhejo</button></div>
+<div id="chat"></div>
+<p class="note"><span class="tag">DEMO</span> Ye demo assistant hai: pehle se likhe jawab aur aapke saved trips se hisaab. Ye koi action nahi karta aur live AI/server se juda nahi hai.</p>
+</section>
+
+<section id="safety" hidden>
+<h2>Safety Center</h2>
+<div class="emg"><h3>Battery se dhuaan, aag, phoolna ya jalne ki badbu?</h3>
+Gaadi turant rok kar door hat jaayein. Charge ya chalaayein nahi. Battery kholne ya theek karne ki koshish na karein. Zarurat ho to local emergency service (112) ya qualified technician ko bulaayein.</div>
+<div class="card" style="margin-top:14px"><h3>Roz ki checklist</h3>
+<label><input type="checkbox" style="width:auto;min-height:0"> Raat ke liye lights/reflector theek hain</label>
+<label><input type="checkbox" style="width:auto;min-height:0"> Zyada sawari/saman nahi bhara</label>
+<label><input type="checkbox" style="width:auto;min-height:0"> Tyre aur brake check kiye</label>
+<label><input type="checkbox" style="width:auto;min-height:0"> Lambe samay se thake nahi hain, thodi der aaram kiya</label></div>
+<form class="card" id="hf"><h3>Khatre ki report</h3>
+<label for="hc">Kya hai?</label><select id="hc"><option>Gadda / pothole</option><option>Paani bhara</option><option>Andhera / light nahi</option><option>Gaadi kharab</option></select>
+<label for="hd">Jagah / vivaran</label><input id="hd" maxlength="140" placeholder="Jaise: chauraha ke paas">
+<button class="btn" type="submit" style="margin-top:10px">Report Save Karein</button>
+<p class="note">Sirf is phone mein save hoti hai, kisi ko bheji nahi jaati. Naam ya number na likhein.</p><div id="hl"></div></form>
+</section>
+<section id="landing">
+<div class="hero"><h1>Aapki E-Rickshaw Ka Smart Saathi</h1><p>Battery health samjho, range track karo, safety badhao — bas bolkar.</p><button class="btn" data-go="home">Apna Dashboard Kholo</button> <button class="btn alt" data-go="saathi">🎙 Saathi AI Se Baat Karein</button></div>
+<div class="cards2"><div class="card"><h3>🔋 Battery ka sach</h3><p class="note">Har number par tag: aapne bataya, hisaab ya andaza.</p></div><div class="card"><h3>📏 Range aur kharcha</h3><p class="note">Trips se ₹ per km aur range ka conservative andaza.</p></div><div class="card"><h3>🎙 Bolkar poochhein</h3><p class="note">Hindi, English, Bangla, Marathi mein. Likhne ka option bhi hai.</p></div><div class="card"><h3>🛡 Safety</h3><p class="note">Emergency guidance, daily checklist aur khatre ki report.</p></div></div>
+<div class="card" style="margin-top:14px"><h3>Kaise kaam karta hai</h3><ol><li>Trip ka odometer aur charge % likhein.</li><li>App batata hai kaun sa number pakka hai aur kaun sa sirf andaza.</li><li>Range, kharcha aur maintenance yaad dilaane wale kaam ek jagah.</li></ol></div>
+<p class="note">BatteryTruth AI ek hackathon demo hai. Sample data par SAMPLE likha hota hai. Koi field testing ya driver interview claim nahi kiya gaya.</p></section>
+
+<section id="health" hidden><h2>Battery Health</h2>
+<div class="card"><p id="hsum"></p><p class="warn">Charge % se battery ki asli health (SOH) nahi naapi ja sakti. Asli capacity ke liye professional test chahiye.</p></div>
+<form class="card" id="sf"><h3>Dikkat note karein</h3><label for="sy">Kya dikkat hai?</label><select id="sy"><option>Range kam hui</option><option>Charge jaldi utarta hai</option><option>Charge hone mein zyada time</option><option>Battery garam hoti hai</option><option>Kuch aur</option></select><label for="sn">Note</label><input id="sn" maxlength="120"><button class="btn" style="margin-top:10px">Note save karein</button><div id="sl"></div></form>
+<div class="card"><h3>Battery badalne se pehle</h3><label><input type="checkbox" style="width:auto;min-height:0"> Technician se capacity test karwaya</label><label><input type="checkbox" style="width:auto;min-height:0"> Charger aur wiring check ki</label><label><input type="checkbox" style="width:auto;min-height:0"> Terminals saaf aur kase hue hain</label><label><input type="checkbox" style="width:auto;min-height:0"> Warranty check ki</label><label><input type="checkbox" style="width:auto;min-height:0"> Do jagah se rate poochha</label></div></section>
+
+<section id="charge" hidden><h2>Charging Coach</h2>
+<div class="card"><h3>Aam salah</h3><p id="cg"></p><p class="note">Ye aam jaankari hai. Pakka niyam gaadi ya battery banane waale ki manual mein dekhein. Battery ki umar kitni badhegi, iska koi vaada nahi.</p></div>
+<form class="card" id="cf"><h3>Charging likhein</h3><label for="ch">Kitne ghante charge kiya</label><input id="ch" type="number" min="0" max="24" step="0.5" inputmode="decimal"><label for="cc">Kharcha (₹, optional)</label><input id="cc" type="number" min="0" inputmode="decimal"><p class="err" id="cerr" role="alert"></p><button class="btn">Save karein</button><div id="cl"></div></form>
+<div class="card"><h3>Charging yaad dilaane ka time</h3><input type="time" id="rt" aria-label="Reminder time"><p class="note" id="rmsg"></p><p class="note">Reminder sirf is page par dikhta hai. App band hone par notification nahi aata.</p></div></section>
+
+<section id="maint" hidden><h2>Maintenance Planner</h2><p class="note">Ye yaad dilane wali list hai, jaanch ya diagnosis nahi. Din apne manufacturer ke hisaab se badlein.</p><div id="ml"></div></section>
+
+<section id="finder" hidden><h2>Service Finder</h2>
+<div class="card"><label for="fa">Aapka ilaka</label><input id="fa" maxlength="60"><label for="fc">Kya chahiye?</label><select id="fc"><option>EV charging station</option><option>E-rickshaw repair</option><option>Battery shop</option><option>Tyre puncture repair</option></select><a class="btn" id="fl" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;margin-top:12px">OpenStreetMap par khojein</a><p class="note">Ye link OpenStreetMap ka search kholta hai. Wahan ki jaankari hamari verify ki hui nahi hai.</p></div>
+<div class="card"><h3>Verified list</h3><p>Abhi koi charging ya service provider jodha nahi gaya hai, isliye hum koi naam, number ya "khula hai" jaisi jaankari nahi dikhate. Provider jodne par list yahin aayegi.</p></div></section>
+
+<section id="passport" hidden><h2>Battery Passport</h2><p class="note">Sab kuch aapne bataya hai, kisi ne verify nahi kiya. Khaali ka matlab abhi pata nahi.</p>
+<div class="card"><label for="p_nick">Gaadi ka naam</label><input id="p_nick" maxlength="40"><label for="p_cap">Battery capacity (kWh)</label><input id="p_cap" type="number" min="0" step="0.1"><label for="p_buy">Kharidne ki taareekh</label><input id="p_buy" type="date"><label for="p_warr">Warranty kab tak</label><input id="p_warr" type="date"></div>
+<div class="card" id="ps"></div>
+<form class="card" id="pr"><h3>Service / repair record</h3><label for="pk">Kya hua?</label><select id="pk"><option>Service</option><option>Repair</option><option>Inspection</option><option>Battery badli</option></select><label for="pd">Taareekh</label><input id="pd" type="date"><label for="pn">Note</label><input id="pn" maxlength="120"><button class="btn" style="margin-top:10px">Record jodein</button><div id="phl"></div></form></section>
+
+<section id="report" hidden><h2>Reports & Settings</h2>
+<div class="card"><label for="rf">Samay</label><select id="rf"><option value="all">Sab trips (sample sahit)</option><option value="30">Pichhle 30 din</option><option value="7">Pichhle 7 din</option></select><div id="rb2" style="margin-top:12px"></div><button class="btn" onclick="print()" style="margin-top:12px">Report print karein</button></div>
+<div class="card"><h3>Settings</h3><p class="note">Saara data sirf is phone ke browser mein hai. Kisi server par sync nahi hota.</p><button class="btn red" id="wipe">Saara data mitaayein</button></div></section>
+</main>
+<nav id="nav"></nav>
+<script>
+const $=id=>document.getElementById(id),K='bt_';
+const ld=(k,d)=>{try{const v=localStorage.getItem(K+k);return v?JSON.parse(v):d}catch(e){return d}};
+const sv=(k,v)=>{try{localStorage.setItem(K+k,JSON.stringify(v))}catch(e){}};
+const SAMPLE=[[1200,1262,95,30,40,'Sample'],[1262,1322,100,32,45,''],[1322,1380,98,35,40,''],[1380,1432,100,45,38,'Charge jaldi gira'],[1432,1485,97,40,42,'']].map((r,i)=>({id:'s'+i,o1:r[0],o2:r[1],c1:r[2],c2:r[3],cost:r[4],nt:r[5],sample:true}));
+let trips=ld('trips',null);if(!trips){trips=SAMPLE;sv('trips',trips)}
+let hz=ld('hz',[]),prof=ld('prof',{});
+const dist=t=>t.o2-t.o1,used=t=>t.c1-t.c2,kpc=t=>used(t)>0?dist(t)/used(t)*100:null;
+const avgK=()=>{const a=trips.map(kpc).filter(x=>x);return a.length?a.reduce((s,x)=>s+x,0)/a.length:null};
+const TABS=[['landing','✨','Landing'],['home','🏠','Dashboard'],['health','🔋','Battery'],['range','📏','Range'],['trips','🛺','Trip'],['charge','🔌','Charging'],['maint','🔧','Planner'],['safety','🛡','Safety'],['finder','📍','Finder'],['passport','📘','Passport'],['saathi','🎙','Saathi'],['report','📊','Reports']];
+$('nav').innerHTML=TABS.map(t=>`<button data-go="${t[0]}"><span class="i">${t[1]}</span>${t[2]}</button>`).join('');
+function go(id){TABS.forEach(t=>$(t[0]).hidden=t[0]!==id);document.querySelectorAll('nav button').forEach(b=>b.dataset.go===id?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));if(id!=='saathi')stopSpeak();if(typeof pages==='function')pages();scrollTo(0,0)}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)go(b.dataset.go)});
+function drawGauge(){const p=prof.pct??60,k=avgK(),km=k?k*p/100*0.9:null,n=Math.round(p/10);
+ $('gauge').innerHTML=`<h3>Sach Meter: abhi kitna chalegi?</h3><div class="cells" aria-hidden="true">${Array.from({length:10},(_,i)=>`<b class="${i<n?'on '+(p<25?'lo':p<50?'mid':''):''}"></b>`).join('')}</div><label for="gp">Abhi charge: <span id="gv">${p}</span>%</label><input id="gp" type="range" min="0" max="100" step="5" value="${p}"><div class="big">${km?'~'+km.toFixed(0)+' km':'—'}</div><p class="note">${km?'<i class="ev e">Andaza</i> aapke trips ke average se, 90% suraksha margin ke saath. '+(trips.some(t=>t.sample)?'<i class="ev s">Sample data</i>':''):'Andaza ke liye charge % ke saath trips jodein.'}<br>Har number par tag hai: <i class="ev u">Aapne bataya</i> <i class="ev c">Hisaab</i> <i class="ev e">Andaza</i> <i class="ev s">Sample</i>. Jo pakka nahi, wo pakka nahi likha jaata.</p>`;
+ $('gp').oninput=e=>$('gv').textContent=e.target.value;$('gp').onchange=e=>{prof.pct=+e.target.value;sv('prof',prof);drawGauge()}}
+function render(){drawGauge();
+ const d=trips.reduce((s,t)=>s+dist(t),0),c=trips.reduce((s,t)=>s+(+t.cost||0),0),k=avgK(),smp=trips.some(t=>t.sample);
+ $('stats').innerHTML=[[d.toFixed(0)+' km','Total doori'],['₹'+c.toFixed(0),'Charging kharcha'],[d>0&&c>0?'₹'+(c/d).toFixed(2):'—','Kharcha per km'],[k?k.toFixed(0)+' km':'—','Avg range / full charge']].map((s,i)=>`<div class="stat"><b>${s[0]}</b><span>${s[1]}</span><br><i class="ev ${i<2?'u':i==2?'c':'e'}">${i<2?'Aapne bataya':i==2?'Hisaab':'Andaza'}</i></div>`).join('')+(smp?'<div class="tag" style="grid-column:1/-1">SAMPLE DATA — nakli udaharan</div>':'');
+ const pts=trips.map(kpc).filter(x=>x);
+ if(pts.length<2){$('chart').innerHTML='';$('chartnote').textContent='Trend ke liye kam se kam 2 trips (charge % ke saath) chahiye.'}
+ else{const mx=Math.max(...pts)*1.1,W=300,H=110,xs=i=>10+i*(W-20)/(pts.length-1),ys=v=>H-8-v/mx*(H-20);
+  $('chart').innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Range trend"><polyline fill="none" stroke="#12c26b" stroke-width="3" points="${pts.map((v,i)=>xs(i)+','+ys(v)).join(' ')}"/>${pts.map((v,i)=>`<circle cx="${xs(i)}" cy="${ys(v)}" r="4" fill="#0a8f4e"/><text x="${xs(i)}" y="${ys(v)-8}" font-size="10" text-anchor="middle" fill="currentColor">${v.toFixed(0)}</text>`).join('')}</svg>`;
+  const dr=pts[pts.length-1]-pts[0];$('chartnote').textContent=(dr<-8?'Range ghata hai. Ye sirf aapke note kiye hisaab ka andaza hai, battery kharab hone ka saboot nahi. Technician se check karwayein.':'Range mein bada badlaav nahi dikha.')+' (Lode, sadak, mausam ka asar hota hai.)'}
+ $('tl').innerHTML=trips.length?trips.slice().reverse().map(t=>`<div class="row"><div><b>${dist(t)} km</b>${used(t)>0?' · '+used(t)+'% charge':''}${t.cost?' · ₹'+t.cost:''}${t.sample?' <span class="tag">SAMPLE</span>':''}<br><span class="note">${esc(t.nt||'')}</span></div><button data-del="${t.id}" aria-label="Trip hataayein">Hatao</button></div>`).join(''):'<p>Abhi koi trip nahi. Upar form se pehli trip jodein.</p>';
+ $('hl').innerHTML=hz.map(h=>`<div class="row"><div>${esc(h.c)} — ${esc(h.d||'jagah nahi likhi')}</div></div>`).join('');
+ ['chem','cap','tariff'].forEach(f=>$(f).value=prof[f]||'')}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+['chem','cap','tariff'].forEach(f=>$(f).addEventListener('change',()=>{prof[f]=$(f).value;sv('prof',prof)}));
+$('tf').addEventListener('submit',e=>{e.preventDefault();
+ const g=i=>$(i).value===''?null:+$(i).value,o1=g('o1'),o2=g('o2'),c1=g('c1'),c2=g('c2'),cost=g('cost');
+ let m='';if(o1===null||o2===null)m='Dono odometer reading likhein.';else if(o2<=o1)m='Ant reading shuru se zyada honi chahiye.';
+ else if((c1===null)!==(c2===null))m='Charge % dono likhein ya dono khaali chhodein.';else if(c1!==null&&(c1>100||c2>100||c1<0||c2<0))m='Charge % 0 se 100 ke beech hona chahiye.';
+ else if(c1!==null&&c2>c1)m='Ant charge % shuru se zyada nahi ho sakta (ye trip hai, charging nahi).';
+ $('terr').textContent=m;if(m)return;
+ trips=trips.filter(t=>!t.sample||false).length===trips.length?trips:trips; // keep sample until reset
+ trips.push({id:'t'+Date.now(),o1,o2,c1:c1??0,c2:c2??0,cost:cost||0,nt:$('nt').value.trim()});sv('trips',trips);$('tf').reset();render()});
+document.addEventListener('click',e=>{const d=e.target.dataset.del;if(d){trips=trips.filter(t=>t.id!==d);sv('trips',trips);render()}});
+$('rst').onclick=()=>{trips=SAMPLE.map(t=>({...t}));sv('trips',trips);render()};
+$('hf').addEventListener('submit',e=>{e.preventDefault();hz.push({c:$('hc').value,d:$('hd').value.trim()});sv('hz',hz);$('hd').value='';render()});
+function rangeCalc(base,pct,l,r){return base*pct/100*l*r*0.9}
+$('rgo').onclick=()=>{const b=+$('rb').value,p=+$('rp').value;if(!(b>0)||p<0||p>100||$('rp').value===''){$('rout').innerHTML='<p class="err">Sahi km aur charge % (0-100) likhein.</p>';return}
+ const l=+$('rl').value,r=+$('rr').value,v=rangeCalc(b,p,l,r);
+ $('rout').innerHTML=`<div class="stat"><b>~${v.toFixed(0)} km</b><span>andaazan bacha range (conservative)</span></div><p class="note">Formula: ${b} km × ${p}% × sawari ${l} × sadak ${r} × 0.9 (suraksha margin). Ye sirf andaza hai, guarantee nahi. Asli range battery ki haalat, load, sadak, mausam aur chalane ke tareeke par nirbhar hai. Hamesha reserve rakhein.</p>`};
+// Saathi
+const chat=[];let last='';
+const Q=['Meri battery jaldi khatam kyun ho rahi hai?','Aaj maine kitna kharcha kiya?','Meri gaadi ek charge mein kitna chalegi?','Charge karne ka sahi tareeka kya hai?','Charging ya repair ki jagah batao'];
+$('chips').innerHTML=Q.map(q=>`<button>${q}</button>`).join('');$('chips').onclick=e=>{if(e.target.tagName==='BUTTON')ask(e.target.textContent)};
+const RP={emg:['तुरंत गाड़ी रोकें और बैटरी से दूर हट जाएँ। चार्ज न करें, गाड़ी न चलाएँ। बैटरी खोलने या ठीक करने की कोशिश न करें। ज़रूरत हो तो 112 या योग्य तकनीशियन को बुलाएँ। सिर्फ़ बोलने से मैं पक्का नहीं बता सकता कि क्या ख़राबी है।','Stop the vehicle now and move away from the battery. Do not charge or drive it. Do not open or try to repair the battery. If needed, call 112 or a qualified technician. I cannot tell the exact fault just from what you say.','এখনই গাড়ি থামান এবং ব্যাটারি থেকে দূরে সরে যান। চার্জ করবেন না, গাড়ি চালাবেন না। ব্যাটারি খোলার বা সারানোর চেষ্টা করবেন না। দরকার হলে ১১২ নম্বরে বা যোগ্য টেকনিশিয়ানকে ডাকুন। শুধু কথা শুনে আমি নিশ্চিত করে বলতে পারি না কী গোলমাল।','ताबडतोब गाडी थांबवा आणि बॅटरीपासून दूर व्हा. चार्ज करू नका, गाडी चालवू नका. बॅटरी उघडण्याचा किंवा दुरुस्त करण्याचा प्रयत्न करू नका. गरज पडल्यास ११२ वर किंवा पात्र तंत्रज्ञाला बोलवा. फक्त बोलण्यावरून नेमका बिघाड काय आहे हे मी खात्रीने सांगू शकत नाही.'],
+unk:['माफ़ कीजिए, मैं यह समझ नहीं पाया। आप बैटरी, रेंज, खर्च, चार्जिंग या सुरक्षा के बारे में पूछ सकते हैं।','Sorry, I did not understand. You can ask about battery, range, expenses, charging or safety.','দুঃখিত, বুঝতে পারলাম না। আপনি ব্যাটারি, রেঞ্জ, খরচ, চার্জিং বা নিরাপত্তা নিয়ে জিজ্ঞাসা করতে পারেন।','माफ करा, मला समजले नाही. तुम्ही बॅटरी, रेंज, खर्च, चार्जिंग किंवा सुरक्षिततेबद्दल विचारू शकता.'],
+cost:['आपके सेव किए ट्रिप में चार्जिंग खर्च कुल ₹{c} है, {d} किमी के लिए, यानी लगभग ₹{p} प्रति किमी।','Your saved trips show a total charging cost of ₹{c} for {d} km, about ₹{p} per km.','আপনার সেভ করা ট্রিপে চার্জিংয়ে মোট ₹{c} খরচ হয়েছে, {d} কিমির জন্য, অর্থাৎ প্রায় ₹{p} প্রতি কিমি।','तुमच्या सेव्ह केलेल्या ट्रिपमध्ये चार्जिंगचा एकूण खर्च ₹{c} आहे, {d} किमीसाठी, म्हणजे सुमारे ₹{p} प्रति किमी.'],
+rng:['आपके सेव किए ट्रिप के हिसाब से पूरे चार्ज पर लगभग {k} किमी। यह सिर्फ़ अंदाज़ा है; लोड और सड़क से बदल सकता है।','Based on your saved trips, about {k} km on a full charge. This is only an estimate; load and road conditions change it.','আপনার সেভ করা ট্রিপ অনুযায়ী পুরো চার্জে প্রায় {k} কিমি। এটি শুধু অনুমান; লোড ও রাস্তার উপর নির্ভর করে বদলাতে পারে।','तुमच्या सेव्ह केलेल्या ट्रिपनुसार पूर्ण चार्जवर सुमारे {k} किमी. हा फक्त अंदाज आहे; भार आणि रस्त्यानुसार बदलू शकतो.']};
+function reply(q){if(lang==='hg')return reply0(q);const i=IX[lang],s=q.toLowerCase(),has=(...w)=>w.some(x=>s.includes(x));
+ if(has('dhuan','dhuaan','smoke','aag','fire','phool','swell','badbu','burn','धुआं','धुएँ','धुँआ','आग','जलने','जला','ধোঁয়া','ধোয়া','আগুন','ফুল','পোড়া','धूर','जळ','फुग'))return RP.emg[i];
+ if(has('kharch','खर्च','খরচ','cost','expense','spent')){const c=trips.reduce((a,t)=>a+(+t.cost||0),0),d=trips.reduce((a,t)=>a+dist(t),0);return c>0&&d>0?RP.cost[i].replace('{c}',c.toFixed(0)).replace('{d}',d).replace('{p}',(c/d).toFixed(2)):reply0('kharcha')}
+ if(has('range','कितना चल','कितनी दूर','কত দূর','কতটা','किती','how far')){const k=avgK();return k?RP.rng[i].replace('{k}',k.toFixed(0)):reply0('range')}
+ const r=reply0(q);return r.startsWith('Maaf kijiye')?RP.unk[i]:r}
+function reply0(q){const s=q.toLowerCase(),has=(...w)=>w.some(x=>s.includes(x));
+ if(has('dhuan','dhuaan','smoke','aag','fire','phool','swell','jal','badbu','burn','garam','गर्म','आग','धुआं'))return'Turant gaadi rok dein aur battery se door hat jaayein. Charge ya chalaayein nahi. Battery kholne ya theek karne ki koshish na karein. Zarurat ho to 112 ya qualified technician ko bulaayein. Main sirf bolne se pakka nahi bata sakta ki kya kharabi hai.';
+ if(has('kharch','kharcha','kitna paisa','खर्च')){const c=trips.reduce((s,t)=>s+(+t.cost||0),0),d=trips.reduce((s,t)=>s+dist(t),0);return trips.length&&c?`Aapke saved trips mein charging kharcha kul ₹${c.toFixed(0)} hai, ${d} km ke liye, yaani lagbhag ₹${(c/d).toFixed(2)} per km.${trips.some(t=>t.sample)?' Dhyan dein, ye sample data hai.':''}`:'Abhi kharcha record nahi hai. Trip tab mein charging kharcha jodein.'}
+ if(has('kitna chal','range','kitni door','चलेगी')){const k=avgK();return k?`Aapke saved trips ke hisaab se poore charge par lagbhag ${k.toFixed(0)} km. Ye andaza hai, load aur sadak se badal sakta hai.${trips.some(t=>t.sample)?' (Sample data par aadharit.)':''} Sahi hisaab ke liye Range tab dekhein.`:'Range nikaalne ke liye charge % ke saath kuch trips jodein.'}
+ if(has('jaldi','khatam','drain','kam chal','ghat')){const k=avgK();return'Kai kaaran ho sakte hain: zyada load, kharab sadak, tyre ki hawa kam, battery purani hona, ya charger ki dikkat. Main pakka nahi bata sakta ki battery kharab hai. '+(k?'Trip tab mein dekhein ki range ghata hai ya nahi. ':'')+'Asli capacity technician se test karwayein.'}
+ if(has('charge karne','charging ka','tareeka','sahi')){return'Charging ka sahi tareeka battery ke type par nirbhar hai (lead-acid ya lithium). Hamesha gaadi aur battery banane waale ke bataaye charger aur niyam use karein. Garam ya geeli jagah charge na karein, aur kharab taar ya charger na lagaayein. Pakka niyam ke liye apni manual dekhein.'}
+ if(has('jagah','station','repair','service','kahan','nearby'))return'Mere paas abhi asli charging ya service centre ki live list nahi hai, isliye main koi naam ya number nahi bataunga. Aap maps app mein aas-paas khojein ya local dealer se poochhein.';
+ if(has('record','trip')){go('trips');return'Maine Trip tab khol diya hai. Wahan odometer aur charge % bhar kar Save dabaayein. Abhi tak kuch save nahi hua hai.'}
+ return'Maaf kijiye, main ye samajh nahi paaya. Aap battery, range, kharcha, charging ya safety ke baare mein poochh sakte hain.'}
+function ask(q){q=q.trim();if(!q)return;chat.push(['u',q]);const a=reply(q);last=a;chat.push(['a',a]);
+ $('chat').innerHTML=chat.slice().reverse().map(m=>`<div class="msg ${m[0]}">${esc(m[1])}</div>`).join('');speak(a)}
+$('ts').onclick=()=>{ask($('ti').value);$('ti').value=''};$('ti').onkeydown=e=>{if(e.key==='Enter')$('ts').click()};
+function speak(t){if(!('speechSynthesis'in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang=LC[lang]||'hi-IN';speechSynthesis.speak(u)}
+function stopSpeak(){if('speechSynthesis'in window)speechSynthesis.cancel()}
+$('rep').onclick=()=>last?speak(last):0;$('stp').onclick=stopSpeak;
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null;
+if(!SR){$('mic').disabled=true;$('mic').style.opacity=.4;$('mstat').textContent='Is browser mein bolkar poochhna kaam nahi karta. Neeche likhkar poochhein.'}
+$('mic').onclick=()=>{if(!SR)return;if(rec){rec.stop();return}
+ rec=new SR();rec.lang=LC[lang]||'hi-IN';rec.interimResults=true;$('mic').classList.add('on');$('mstat').textContent='Sun raha hoon…';
+ rec.onresult=e=>{const r=e.results[e.results.length-1];$('mstat').textContent=r[0].transcript;if(r.isFinal)ask(r[0].transcript)};
+ rec.onerror=e=>{$('mstat').textContent=e.error==='not-allowed'?'Mic ki ijazat nahi mili. Browser settings mein mic allow karein, ya likhkar poochhein.':'Awaaz nahi pakdi gayi. Dobara try karein ya likhein.'};
+ rec.onend=()=>{rec=null;$('mic').classList.remove('on')};try{rec.start()}catch(e){rec=null;$('mic').classList.remove('on')}};
+let lang='hg';const LC={hg:'hi-IN',hi:'hi-IN',en:'en-IN',bn:'bn-IN',mr:'mr-IN'},IX={hi:0,en:1,bn:2,mr:3},O=new WeakMap();
+const D={'Data sirf is phone mein':['डेटा सिर्फ़ इसी फ़ोन में','Data stays on this phone','ডেটা শুধু এই ফোনে','डेटा फक्त याच फोनमध्ये'],'Home':['होम','Home','হোম','होम'],'Trip':['ट्रिप','Trip','ট্রিপ','ट्रिप'],'Range':['रेंज','Range','রেঞ্জ','रेंज'],'Saathi':['साथी','Saathi','সাথী','साथी'],'Safety':['सुरक्षा','Safety','নিরাপত্তা','सुरक्षा'],
+'Aapki E-Rickshaw Ka Smart Saathi':['आपकी ई-रिक्शा का स्मार्ट साथी',"Your e-rickshaw's smart companion",'আপনার ই-রিকশার স্মার্ট সাথী','तुमच्या ई-रिक्षाचा स्मार्ट साथी'],
+'Battery health samjho, range track karo, safety badhao — bas bolkar.':['बैटरी की सेहत समझें, रेंज ट्रैक करें, सुरक्षा बढ़ाएँ — बस बोलकर।','Understand battery health, track range, improve safety — just by speaking.','ব্যাটারির অবস্থা বুঝুন, রেঞ্জ ট্র্যাক করুন, নিরাপত্তা বাড়ান — শুধু বলে।','बॅटरीची स्थिती समजून घ्या, रेंज ट्रॅक करा, सुरक्षितता वाढवा — फक्त बोलून.'],
+'Trip Jodein':['ट्रिप जोड़ें','Add a trip','ট্রিপ যোগ করুন','ट्रिप जोडा'],'🎙 Saathi AI Se Baat Karein':['🎙 साथी AI से बात करें','🎙 Talk to Saathi AI','🎙 সাথী AI-এর সাথে কথা বলুন','🎙 साथी AI शी बोला'],
+'Sach Meter: abhi kitna chalegi?':['सच मीटर: अभी कितना चलेगी?','Truth Meter: how far now?','সত্য মিটার: এখন কতদূর চলবে?','सत्य मीटर: आता किती चालेल?'],'Abhi charge:':['अभी चार्ज:','Charge now:','এখন চার্জ:','आत्ताचा चार्ज:'],
+'Total doori':['कुल दूरी','Total distance','মোট দূরত্ব','एकूण अंतर'],'Charging kharcha':['चार्जिंग खर्च','Charging cost','চার্জিং খরচ','चार्जिंग खर्च'],'Kharcha per km':['खर्च प्रति किमी','Cost per km','প্রতি কিমি খরচ','खर्च प्रति किमी'],'Avg range / full charge':['औसत रेंज / फुल चार्ज','Avg range / full charge','গড় রেঞ্জ / ফুল চার্জে','सरासरी रेंज / फुल चार्ज'],
+'Aapne bataya':['आपने बताया','You reported','আপনি জানিয়েছেন','तुम्ही सांगितले'],'Hisaab':['हिसाब','Calculated','হিসাব','हिशोब'],'Andaza':['अंदाज़ा','Estimate','অনুমান','अंदाज'],
+'Gaadi ki jaankari':['गाड़ी की जानकारी','Vehicle details','গাড়ির তথ্য','गाडीची माहिती'],'Battery type':['बैटरी का प्रकार','Battery type','ব্যাটারির ধরন','बॅटरीचा प्रकार'],'Pata nahi':['पता नहीं','Not sure','জানি না','माहीत नाही'],
+'Battery capacity (kWh, agar pata ho)':['बैटरी क्षमता (kWh, अगर पता हो)','Battery capacity (kWh, if known)','ব্যাটারির ক্ষমতা (kWh, জানা থাকলে)','बॅटरी क्षमता (kWh, माहीत असल्यास)'],'Bijli ka rate (₹ per unit)':['बिजली की दर (₹ प्रति यूनिट)','Electricity rate (₹ per unit)','বিদ্যুতের দাম (₹ প্রতি ইউনিট)','विजेचा दर (₹ प्रति युनिट)'],
+'Trip aur kharcha':['ट्रिप और खर्च','Trips and expenses','ট্রিপ ও খরচ','ट्रिप आणि खर्च'],'Shuru odometer (km)':['शुरू का ओडोमीटर (किमी)','Start odometer (km)','শুরুর ওডোমিটার (কিমি)','सुरुवातीचा ओडोमीटर (किमी)'],'Ant odometer (km)':['अंत का ओडोमीटर (किमी)','End odometer (km)','শেষের ওডোমিটার (কিমি)','शेवटचा ओडोमीटर (किमी)'],
+'Shuru charge %':['शुरू का चार्ज %','Start charge %','শুরুর চার্জ %','सुरुवातीचा चार्ज %'],'Ant charge %':['अंत का चार्ज %','End charge %','শেষের চার্জ %','शेवटचा चार्ज %'],'Charging kharcha (₹, optional)':['चार्जिंग खर्च (₹, वैकल्पिक)','Charging cost (₹, optional)','চার্জিংয়ের খরচ (₹, ঐচ্ছিক)','चार्जिंग खर्च (₹, ऐच्छिक)'],
+'Note / dikkat':['नोट / दिक़्क़त','Note / problem','নোট / সমস্যা','नोंद / अडचण'],'Trip Save Karein':['ट्रिप सेव करें','Save trip','ট্রিপ সেভ করুন','ट्रिप सेव्ह करा'],'Sample data wapas laayein':['सैंपल डेटा वापस लाएँ','Restore sample data','স্যাম্পল ডেটা ফিরিয়ে আনুন','सॅम्पल डेटा परत आणा'],
+'Range Predictor':['रेंज प्रेडिक्टर','Range Predictor','রেঞ্জ প্রেডিক্টর','रेंज प्रेडिक्टर'],'Pichhle hisaab se poore charge pe km':['पिछले हिसाब से पूरे चार्ज पर किमी','Km per full charge (from recent use)','সাম্প্রতিক হিসাবে পুরো চার্জে কিমি','अलीकडील हिशोबाने पूर्ण चार्जवर किमी'],'Abhi charge %':['अभी चार्ज %','Charge now %','এখন চার্জ %','आत्ताचा चार्ज %'],
+'Sawari / saman':['सवारी / सामान','Passengers / load','যাত্রী / মালপত্র','प्रवासी / सामान'],'Sadak':['सड़क','Road','রাস্তা','रस्ता'],'Range Nikaalein':['रेंज निकालें','Calculate range','রেঞ্জ বের করুন','रेंज काढा'],'andaazan bacha range (conservative)':['अंदाज़न बची रेंज (सावधानी वाला)','estimated range left (conservative)','অনুমানে বাকি রেঞ্জ (সতর্ক)','अंदाजे उरलेली रेंज (सावध)'],
+'Saathi AI':['साथी AI','Saathi AI','সাথী AI','साथी AI'],'⚠ Gaadi chalate waqt phone use na karein. Safe jagah rukkar poochhein.':['⚠ गाड़ी चलाते समय फ़ोन इस्तेमाल न करें। सुरक्षित जगह रुककर पूछें।','⚠ Do not use the phone while driving. Stop in a safe place before asking.','⚠ গাড়ি চালানোর সময় ফোন ব্যবহার করবেন না। নিরাপদ জায়গায় থেমে জিজ্ঞাসা করুন।','⚠ गाडी चालवताना फोन वापरू नका. सुरक्षित जागी थांबून विचारा.'],
+'Mic dabaakar bolein':['माइक दबाकर बोलें','Press the mic and speak','মাইক চেপে বলুন','माइक दाबून बोला'],'🔁 Phir sunao':['🔁 फिर सुनाओ','🔁 Repeat','🔁 আবার শোনান','🔁 पुन्हा ऐकवा'],'⏹ Chup':['⏹ चुप','⏹ Stop','⏹ থামুন','⏹ थांबवा'],'Bhejo':['भेजें','Send','পাঠান','पाठवा'],
+'Ye demo assistant hai: pehle se likhe jawab aur aapke saved trips se hisaab. Ye koi action nahi karta aur live AI/server se juda nahi hai.':['यह डेमो असिस्टेंट है: पहले से लिखे जवाब और आपके सेव किए ट्रिप से हिसाब। यह कोई काम नहीं करता और लाइव AI/सर्वर से जुड़ा नहीं है।','This is a demo assistant: prewritten answers plus calculations from your saved trips. It performs no actions and is not connected to a live AI or server.','এটি একটি ডেমো সহকারী: আগে থেকে লেখা উত্তর ও আপনার সেভ করা ট্রিপ থেকে হিসাব। এটি কোনো কাজ করে না এবং লাইভ AI/সার্ভারের সাথে যুক্ত নয়।','हा डेमो सहाय्यक आहे: आधी लिहिलेली उत्तरे आणि तुमच्या सेव्ह केलेल्या ट्रिपवरून हिशोब. हा कोणतीही कृती करत नाही आणि लाइव्ह AI/सर्व्हरशी जोडलेला नाही.'],
+'Safety Center':['सुरक्षा केंद्र','Safety Center','নিরাপত্তা কেন্দ্র','सुरक्षा केंद्र'],'Battery se dhuaan, aag, phoolna ya jalne ki badbu?':['बैटरी से धुआँ, आग, फूलना या जलने की बदबू?','Smoke, fire, swelling or burning smell from the battery?','ব্যাটারি থেকে ধোঁয়া, আগুন, ফোলা বা পোড়া গন্ধ?','बॅटरीतून धूर, आग, फुगणे किंवा जळण्याचा वास?'],
+'Gaadi turant rok kar door hat jaayein. Charge ya chalaayein nahi. Battery kholne ya theek karne ki koshish na karein. Zarurat ho to local emergency service (112) ya qualified technician ko bulaayein.':RP.emg,
+'Roz ki checklist':['रोज़ की चेकलिस्ट','Daily checklist','প্রতিদিনের চেকলিস্ট','रोजची चेकलिस्ट'],'Khatre ki report':['ख़तरे की रिपोर्ट','Hazard report','বিপদের রিপোর্ট','धोक्याची तक्रार'],'Report Save Karein':['रिपोर्ट सेव करें','Save report','রিপোর্ট সেভ করুন','तक्रार सेव्ह करा']};
+function applyLang(){const i=IX[lang],w=document.createTreeWalker(document.body,4);let n;while(n=w.nextNode()){if(n.parentNode.tagName==='SCRIPT')continue;if(!O.has(n))O.set(n,n.nodeValue);const o=O.get(n),t=o.trim(),d=D[t];n.nodeValue=i!==undefined&&d?o.replace(t,()=>d[i]):o}
+ document.querySelectorAll('[placeholder]').forEach(e=>{e.dataset.o=e.dataset.o||e.placeholder})}
+function setLang(v){lang=v;sv('lang',v);document.documentElement.lang=v==='hg'?'hi':v;$('lang').value=v;stopSpeak();applyLang()}
+$('lang').onchange=e=>setLang(e.target.value);let busy=0;new MutationObserver(()=>{if(!busy){busy=1;requestAnimationFrame(()=>{busy=0;applyLang()})}}).observe(document.body,{childList:true,subtree:true});
+const MD=[['Tyre mein hawa',7,'Kam hawa se range ghatti hai aur tyre jaldi ghista hai.'],['Brake check',14,'Brake dheela ho to rukna mushkil hota hai.'],['Light, horn, reflector',14,'Raat mein dikhne aur dikhane ke liye zaruri.'],['Battery terminals dekhein',30,'Dhila ya zang laga terminal garmi aur nuksaan karta hai. Battery khud na kholein.'],['Pahiye aur axle ki grease',30,'Ghumne wale hisse mein grease se ghisaav kam hota hai.'],['Workshop mein poori service',90,'Kisi jaankar mechanic se poori jaanch karwayein.']];
+let mt=ld('mt',MD.map(m=>({n:m[0],d:m[1],e:m[2],l:null}))),hs=ld('hs',[]),cs=ld('cs',[]),pp=ld('pp',{}),ph=ld('ph',[]),rem=ld('rem','');
+const DAY=864e5,due=m=>m.l?Math.ceil((m.l+m.d*DAY-Date.now())/DAY):null,late=d=>d<0?Math.abs(d)+' din late':d+' din mein',G={'Lead-acid':'Lead-acid: poori tarah khaali hone se pehle charge karein. Hawadar jagah mein charge karein. Agar battery mein pani dalta hai to level dekhte rahein.','Lithium-ion':'Lithium-ion: sirf sahi ya compatible charger use karein. Dhoop ya bahut garam jagah mein charge na karein. Battery pack kholein nahi.'};
+function psum(){const c=prof.chem;$('ps').innerHTML='<h3>Passport ek nazar mein</h3>'+[['Gaadi ka naam',pp.nick],['Battery type',c],['Capacity',pp.cap&&pp.cap+' kWh'],['Khareed',pp.buy],['Warranty tak',pp.warr]].map(r=>`<div class="row"><span>${r[0]}</span><span>${r[1]?esc(r[1])+' <i class="ev u">Aapne bataya</i>':'<i class="ev s">Khaali, abhi pata nahi</i>'}</span></div>`).join('')+'<p class="note">Koi bhi field verify nahi hui hai.</p>'}
+function rep(){const f=$('rf').value,now=Date.now(),ts=trips.filter(t=>f==='all'||(!t.sample&&now-(+String(t.id).slice(1))<=f*DAY)),d=ts.reduce((s,t)=>s+dist(t),0),c=ts.reduce((s,t)=>s+(+t.cost||0),0),k=ts.map(kpc).filter(x=>x),nc=ts.length-k.length;
+ $('rb2').innerHTML=`<div class="grid">${[[ts.length,'Trips'],[d+' km','Total doori'],['₹'+c.toFixed(0),'Charging kharcha'],[d>0&&c>0?'₹'+(c/d).toFixed(2):'—','Kharcha per km (hisaab)'],[k.length?(k.reduce((a,b)=>a+b,0)/k.length).toFixed(0)+' km':'—','Avg range (andaza)'],[mt.filter(m=>m.l).length,'Maintenance ho chuka'],[hs.length,'Dikkat notes'],[hz.length,'Khatre ki reports']].map(s=>`<div class="stat"><b>${s[0]}</b><span>${s[1]}</span></div>`).join('')}</div><p class="note">${nc?nc+' trips mein charge % nahi hai, isliye range mein nahi gine gaye. ':''}${ts.some(t=>t.sample)?'Sample data shaamil hai.':''}</p>`}
+function flink(){$('fl').href='https://www.openstreetmap.org/search?query='+encodeURIComponent($('fc').value+' near '+$('fa').value)}
+function pages(){
+ const k=trips.map(kpc).filter(x=>x);
+ $('hsum').innerHTML=k.length<3?`Abhi kam data hai (${k.length} trip charge % ke saath). Trend ke liye kam se kam 3 trips ke odometer aur charge % likhein.`:`Pehli trip: ~${k[0].toFixed(0)} km, ab: ~${k[k.length-1].toFixed(0)} km per full charge <i class="ev e">Andaza</i> ${trips.some(t=>t.sample)?'<i class="ev s">Sample</i>':''}`;
+ $('sl').innerHTML=hs.slice().reverse().map(h=>`<div class="row"><div>${esc(h.s)}<br><span class="note">${esc(h.n||'')} ${new Date(h.t).toLocaleDateString('en-IN')} <i class="ev u">Aapne bataya</i></span></div></div>`).join('');
+ $('cg').textContent=G[prof.chem]||'Pehle Dashboard par battery type chunein (battery par likha hota hai). Pata na ho to technician se poochhein.';
+ const tc=cs.reduce((s,c)=>s+c.c,0);$('cl').innerHTML=cs.length?`<p class="note">${cs.length} baar charge, kul ₹${tc.toFixed(0)}</p>`+cs.slice().reverse().map(c=>`<div class="row"><span>${c.h} ghante${c.c?' · ₹'+c.c:''}</span><span class="note">${new Date(c.t).toLocaleDateString('en-IN')}</span></div>`).join(''):'';
+ $('rt').value=rem;$('rmsg').textContent=rem?'Aapka reminder: roz '+rem:'';
+ $('ml').innerHTML=mt.map((m,i)=>{const d=due(m);return `<div class="card"><b>${esc(m.n)}</b> <span class="tag"${d!==null&&d<0?' style="background:#fde8e8;color:#7a1010"':''}>${d===null?'Record nahi':late(d)}</span><p class="note">${esc(m.e)}</p><label for="md${i}">Har kitne din</label><input id="md${i}" type="number" min="1" value="${m.d}" data-mi="${i}"><button class="btn" data-md="${i}" style="margin-top:8px">Aaj ho gaya</button></div>`}).join('');
+ ['nick','cap','buy','warr'].forEach(f=>{if($('p_'+f)!==document.activeElement)$('p_'+f).value=pp[f]||''});psum();
+ $('phl').innerHTML=ph.slice().reverse().map(h=>`<div class="row"><span>${esc(h.k)} · ${esc(h.d)}<br><span class="note">${esc(h.n)}</span></span></div>`).join('');
+ rep();flink();
+ const nx=mt.map(m=>({m,d:due(m)})).filter(x=>x.d!==null).sort((a,b)=>a.d-b.d)[0];
+ $('dashx').innerHTML=`<div class="card"><h3>Aane wala kaam</h3>${nx?esc(nx.m.n)+': '+late(nx.d):'Abhi koi maintenance record nahi.'}<br><button class="btn alt" data-go="maint" style="color:var(--ink);margin-top:8px">Planner kholein</button></div><div class="card"><h3>Haal ki trips</h3>${trips.slice(-3).reverse().map(t=>`<div class="row"><span>${dist(t)} km${t.sample?' <span class="tag">SAMPLE</span>':''}</span><span class="note">${t.cost?'₹'+t.cost:''}</span></div>`).join('')||'Abhi koi trip nahi.'}</div><div class="card"><h3>Safety</h3>${hz.length?hz.length+' khatre ki report aapne save ki hain.':'Koi report save nahi hai.'} Dhuaan ya aag ho to Safety page dekhein.</div>`}
+$('sf').onsubmit=e=>{e.preventDefault();hs.push({s:$('sy').value,n:$('sn').value.trim(),t:Date.now()});sv('hs',hs);$('sn').value='';pages()};
+$('cf').onsubmit=e=>{e.preventDefault();const h=+$('ch').value,c=+$('cc').value||0;if(!(h>0&&h<=24)||c<0){$('cerr').textContent='Ghante 0 se zyada aur 24 tak likhein.';return}$('cerr').textContent='';cs.push({h,c,t:Date.now()});sv('cs',cs);$('cf').reset();pages()};
+$('pr').onsubmit=e=>{e.preventDefault();ph.push({k:$('pk').value,d:$('pd').value||new Date().toISOString().slice(0,10),n:$('pn').value.trim()});sv('ph',ph);$('pr').reset();pages()};
+$('rt').onchange=e=>{rem=e.target.value;sv('rem',rem);pages()};
+['nick','cap','buy','warr'].forEach(f=>$('p_'+f).oninput=e=>{pp[f]=e.target.value;sv('pp',pp);psum()});
+$('rf').onchange=rep;$('fa').oninput=flink;$('fc').onchange=flink;
+document.addEventListener('click',e=>{const i=e.target.dataset.md;if(i!==undefined){mt[i].l=Date.now();sv('mt',mt);pages()}});
+document.addEventListener('change',e=>{const i=e.target.dataset.mi;if(i!==undefined){const v=+e.target.value;if(v>0){mt[i].d=v;sv('mt',mt);pages()}}});
+$('wipe').onclick=e=>{if(e.target.dataset.s){try{Object.keys(localStorage).filter(k=>k.startsWith(K)).forEach(k=>localStorage.removeItem(k))}catch(x){}location.reload()}else{e.target.dataset.s=1;e.target.textContent='Pakka mitaana hai? Dobara dabaayein'}};
+render();go('landing');setLang(ld('lang','hg'));
+</script></body></html>
