@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>APSI – Micromobility OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+Devanagari:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;--bg:#fff;--bg2:#f1f5f9;--card:#fff;--line:#e2e8f0;--tx:#0f172a;--mu:#5b6b85;--ac:#0f9d78;--ac2:#2563eb;--ok:#16a34a;--warn:#d97706;--bad:#dc2626}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:#eef2f7}
+body{font-family:Inter,"Noto Sans Devanagari","Noto Sans Bengali",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--tx);line-height:1.55;overflow-x:hidden}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--ac2);outline-offset:2px;border-radius:10px}
+.app{max-width:480px;margin:0 auto;min-height:100vh;min-height:100dvh;background:var(--bg);border-inline:1px solid var(--line);padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+.top{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.logo{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;font-weight:800;font-size:.8rem}
+.top h1{flex:1;font-size:1.1rem;font-weight:800}
+.pill{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 14px;font-weight:600;font-size:.85rem;cursor:pointer}
+.scr{padding:16px}
+.scr[hidden]{display:none}
+h2{font-size:1.05rem;margin:22px 0 10px}
+.sub{color:var(--mu);font-size:.9rem;margin-bottom:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px}
+.card p{color:var(--mu);font-size:.9rem}
+.card h3{font-size:.98rem;margin-bottom:2px}
+.row{display:flex;gap:12px;align-items:flex-start}
+.ico{flex:none;display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:rgba(15,157,120,.1);font-size:1.3rem}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chips button{flex:none;border:1px solid var(--line);background:var(--card);padding:9px 16px;border-radius:999px;font-weight:600;cursor:pointer;white-space:nowrap}
+.chips button[aria-pressed="true"]{background:var(--ac2);color:#fff;border-color:var(--ac2)}
+.gauge{text-align:center}
+.gauge svg{width:100%;max-width:300px;height:auto}
+.gt,.gf{fill:none;stroke-width:14;stroke-linecap:round}
+.gt{stroke:var(--line)}
+.gf{stroke:var(--ok);stroke-dasharray:251.3;stroke-dashoffset:251.3;transition:stroke-dashoffset .3s,stroke .3s}
+.gf.warn{stroke:var(--warn)}.gf.bad{stroke:var(--bad)}
+.spd{font-size:2.8rem;font-weight:800;line-height:1;margin-top:-38px}
+.spd small{font-size:1rem;color:var(--mu);font-weight:400}
+.badge{display:inline-block;padding:6px 16px;border-radius:999px;font-weight:700;margin:12px 0;color:#fff;background:var(--ok)}
+.badge.warn{background:var(--warn)}.badge.bad{background:var(--bad)}
+.msg{background:var(--bg2);border-left:4px solid var(--ok);padding:12px 14px;border-radius:10px;text-align:left;min-height:3.6em;font-size:.92rem}
+.msg.warn{border-color:var(--warn)}.msg.bad{border-color:var(--bad)}
+input[type=range]{width:100%;accent-color:var(--ac);height:32px}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{border:1px solid var(--line);background:var(--card);padding:14px;border-radius:14px;font-weight:700;cursor:pointer}
+.btn.sos{background:var(--bad);color:#fff;border:0}
+.btn.pri{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;border:0}
+.sosbox{border:2px solid var(--bad);background:#fef2f2;border-radius:18px;padding:16px;margin-bottom:12px}
+.sosbox[hidden]{display:none}
+.sosbox p{margin-bottom:10px;font-weight:600}
+.fbtn{display:flex;gap:12px;width:100%;background:none;border:0;text-align:left;cursor:pointer;align-items:flex-start}
+.fbtn .t{flex:1;font-weight:600;line-height:1.35}
+.tag{display:block;color:var(--ac2);font-size:.72rem;font-weight:600}
+.chev{color:var(--mu);transition:transform .2s}
+.fbtn[aria-expanded="true"] .chev{transform:rotate(180deg)}
+.fd{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.fd[hidden]{display:none}
+.acc{display:flex;justify-content:space-between;gap:8px;margin:8px 0 6px;font-size:.85rem;color:var(--mu)}
+.acc b{color:var(--ac)}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin-bottom:10px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2))}
+dt{color:var(--tx);font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;margin-top:6px}
+dd{color:var(--mu);font-size:.88rem}
+.node{text-align:center;background:var(--card);border:1px solid var(--ac2);border-radius:14px;padding:12px;font-weight:600;position:relative;margin-bottom:22px}
+.node:not(:last-child)::after{content:"↓";position:absolute;left:50%;bottom:-22px;transform:translateX(-50%);color:var(--ac)}
+.note{color:var(--mu);font-size:.8rem;text-align:center;margin:18px 0}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:20;display:grid;grid-template-columns:repeat(4,1fr);background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
+.nav button{background:none;border:0;padding:6px 2px;border-radius:12px;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--mu);font-size:.72rem;font-weight:600;cursor:pointer}
+.nav button span:first-child{font-size:1.3rem}
+.nav button[aria-selected="true"]{color:var(--ac);background:rgba(15,157,120,.1)}
+.card{box-shadow:0 1px 3px rgba(15,23,42,.06)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;box-shadow:0 1px 3px rgba(15,23,42,.06)}
+.stat b{display:block;font-size:1.6rem;font-weight:800;color:var(--ac2)}
+.stat span{color:var(--mu);font-size:.8rem}
+.veh{align-items:center}.veh .m{flex:1;min-width:0}.veh h3{font-size:.92rem}.veh p{font-size:.8rem}
+.st{font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:99px;background:#dcfce7;color:#15803d;white-space:nowrap}
+.st.riding{background:#dbeafe;color:#1d4ed8}.st.alert{background:#fee2e2;color:#b91c1c}
+.ev{display:flex;gap:8px;font-size:.84rem;padding:8px 0;border-bottom:1px solid var(--line)}
+.ev:last-child{border:0}
+.ev i{flex:none;width:9px;height:9px;border-radius:50%;margin-top:6px;background:var(--ok)}
+.ev i.warn{background:var(--warn)}.ev i.crit{background:var(--bad)}
+.ev small{display:block;color:var(--mu)}
+.con{background:#0f172a;color:#cbd5e1;border-radius:14px;padding:12px;font:.74rem/1.5 ui-monospace,Menlo,Consolas,monospace;overflow-x:auto}
+.con div{margin-bottom:8px;white-space:pre-wrap;word-break:break-all}.con b{color:#34d399}
+.nav{grid-template-columns:repeat(8,1fr)}
+.ph{margin:0;padding:10px;display:flex;flex-direction:column;gap:8px}
+.ph img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px;background:#f1f5f9}
+.ph .btn{padding:10px;font-size:.85rem;text-align:center}
+.up{position:relative;display:block}.up:focus-within{outline:3px solid var(--ac2);outline-offset:2px}
+.vh{position:absolute;inset:0;opacity:0;width:100%;cursor:pointer}
+.nav button{font-size:.58rem;padding:6px 0}.nav button span:first-child{font-size:1.15rem}
+.sel{display:block;width:100%;padding:10px;border:1px solid var(--line);border-radius:12px;background:#fff;margin:4px 0 10px;font:inherit}
+#vmap{width:100%;height:auto;background:#f8fafc;border:1px solid var(--line);border-radius:16px}
+.lg{display:flex;gap:14px;font-size:.8rem;color:var(--mu);margin:8px 0 12px;flex-wrap:wrap}
+.lg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}.g2 label{display:block;font-size:.8rem;color:var(--mu)}
+#repCard .ph{padding:0;margin-bottom:10px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+ <header class="top">
+  <div class="logo" aria-hidden="true">AP</div>
+  <h1 id="title">APSI</h1>
+  <select class="pill" id="langSel" aria-label="Language"><option value="hi">हिन्दी</option><option value="en">English</option><option value="mr">मराठी</option><option value="bn">বাংলা</option></select>
+ </header>
+ <main>
+  <section class="scr" id="s-ride" role="tabpanel" aria-labelledby="t-ride">
+   <p class="sub" data-i="rideSub"></p>
+   <div class="chips" role="group" aria-label="Surface">
+    <button type="button" data-s="road" aria-pressed="true">🛣️ <span data-i="sRoad"></span></button>
+    <button type="button" data-s="foot" aria-pressed="false">🚶 <span data-i="sFoot"></span></button>
+    <button type="button" data-s="wet" aria-pressed="false">🌧️ <span data-i="sWet"></span></button>
+   </div>
+   <div class="card gauge" style="margin-top:12px">
+    <svg viewBox="0 0 200 110" role="img" data-a="gaugeAria" aria-label="Speedometer" xmlns="http://www.w3.org/2000/svg">
+     <path class="gt" d="M20 100 A80 80 0 0 1 180 100"/>
+     <path class="gf" id="gf" d="M20 100 A80 80 0 0 1 180 100"/>
+    </svg>
+    <div class="spd"><span id="spdVal">0</span> <small>km/h</small></div>
+    <span class="badge" id="badge">—</span>
+    <div class="msg" id="alertMsg" role="status" aria-live="polite"></div>
+   </div>
+   <div class="card">
+    <label for="thr"><strong data-i="lThr"></strong>: <span id="thrVal">0</span> km/h</label>
+    <input type="range" id="thr" min="0" max="25" step="1" value="0">
+   </div>
+   <div class="sosbox" id="sosBox" role="alert" hidden>
+    <p id="sosTxt"></p>
+    <button type="button" class="btn pri" id="sosCancel" style="width:100%" data-i="sosCancel"></button>
+   </div>
+   <div class="acts">
+    <button type="button" class="btn" id="resetBtn" data-i="bReset"></button>
+    <button type="button" class="btn sos" id="sosBtn" data-i="sosBtn"></button>
+   </div>
+   <div class="acts" style="margin-top:10px">
+    <div class="card ph"><img id="helmetImg" alt="Sample photo: rider wearing a helmet"><label class="btn up"><span data-i="bUp"></span><input class="vh" type="file" accept="image/*" capture="user" id="helmetFile"></label><button type="button" class="btn pri" id="helmetBtn" data-i="bHelmet"></button></div>
+    <div class="card ph"><img id="parkImg" alt="Sample photo: scooter parked in a bay"><label class="btn up"><span data-i="bUp"></span><input class="vh" type="file" accept="image/*" capture="environment" id="parkFile"></label><button type="button" class="btn pri" id="parkBtn" data-i="bPark"></button></div>
+   </div>
+   <div class="msg" id="chkMsg" data-i="chkIdle" role="status" aria-live="polite" style="margin-top:10px"></div>
+   <h2 data-i="hHelp"></h2><p class="sub" data-i="helpSub"></p>
+   <div class="card"><label for="helpLoc" data-i="lMyLoc"></label><select id="helpLoc" class="sel"></select><button type="button" class="btn sos" id="helpBtn" style="width:100%" data-i="bHelpBtn"></button></div>
+   <div id="helpBox" aria-live="polite"></div>
+   <p class="note" id="syncNote"></p>
+  </section>
+
+  <section class="scr" id="s-fleet" role="tabpanel" aria-labelledby="t-fleet" hidden>
+   <p class="sub" data-i="fleetSub"></p>
+   <div class="stats" id="stats"></div>
+   <h2 data-i="hVeh"></h2><div id="vehList"></div>
+   <h2 data-i="hFleetD"></h2><div id="doubtFleet"></div>
+   <h2 data-i="hEvt"></h2><div id="evtList"></div>
+   <h2 data-i="hApi"></h2><div class="con" id="apiLog"></div>
+  </section>
+
+  <section class="scr" id="s-map" role="tabpanel" aria-labelledby="t-map" hidden>
+   <p class="sub" data-i="mapSub"></p>
+   <svg id="vmap" viewBox="0 0 360 430" role="img" aria-label="Varanasi pothole map">
+    <path d="M250 0C305 120 305 300 245 430" stroke="#bfdbfe" stroke-width="40" fill="none"/>
+    <text x="300" y="250" font-size="11" fill="#60a5fa" transform="rotate(90 300 250)">Ganga</text>
+    <g stroke="#cbd5e1" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M130 70L215 170L262 178"/><path d="M130 70L150 230L140 340L232 395"/><path d="M215 170L150 230"/><path d="M245 40L215 170"/><path d="M95 150L150 230"/></g>
+    <g id="mapPts"></g>
+   </svg>
+   <div class="lg"><span><i style="background:#eab308"></i><span data-i="lgLow"></span></span><span><i style="background:#f97316"></i><span data-i="lgMid"></span></span><span><i style="background:#dc2626"></i><span data-i="lgHigh"></span></span><span id="potCount"></span></div>
+   <div class="card" id="potInfo" role="status" aria-live="polite"></div>
+   <div class="card" id="repCard">
+     <h3 data-i="hRep"></h3>
+     <div class="ph"><img id="repImg" alt="Sample pothole photo"><label class="btn up"><span data-i="bAddPhoto"></span><input class="vh" type="file" accept="image/*" capture="environment" id="repFile"></label></div>
+     <label for="repLoc" data-i="lWhere"></label><select id="repLoc" class="sel"></select>
+     <strong data-i="pSev"></strong>
+     <div class="chips" role="group" data-a="pSev" style="margin:6px 0 10px"><button type="button" data-sv="1" aria-pressed="false" data-i="lgLow"></button><button type="button" data-sv="2" aria-pressed="true" data-i="lgMid"></button><button type="button" data-sv="3" aria-pressed="false" data-i="lgHigh"></button></div>
+     <label for="repNote" data-i="lNote"></label><input id="repNote" class="sel" type="text" maxlength="80">
+     <button type="button" class="btn pri" id="repBtn" style="width:100%" data-i="bReport"></button>
+    </div>
+    <button type="button" class="btn" id="csvBtn" style="width:100%" data-i="bCsv"></button>
+  </section>
+
+  <section class="scr" id="s-trip" role="tabpanel" aria-labelledby="t-trip" hidden>
+   <p class="sub" data-i="tripSub"></p>
+   <div class="card">
+    <label for="fromSel" data-i="lFrom"></label><select id="fromSel" class="sel"></select>
+    <label for="toSel" data-i="lTo"></label><select id="toSel" class="sel"></select>
+    <strong data-i="lTraffic"></strong>
+    <div class="chips" role="group" data-a="lTraffic" style="margin:6px 0 12px"><button type="button" data-tr="0" aria-pressed="false" data-i="tLow"></button><button type="button" data-tr="1" aria-pressed="true" data-i="tMed"></button><button type="button" data-tr="2" aria-pressed="false" data-i="tHeavy"></button></div>
+    <label for="soc"><strong data-i="lSoc"></strong>: <span id="socVal">80</span>%</label>
+    <input type="range" id="soc" min="10" max="100" step="1" value="80">
+   </div>
+   <div class="card" id="tripRes" role="status" aria-live="polite"></div>
+   <h2 data-i="hCalc"></h2>
+    <div class="card"><div class="g2"><div><label for="cWh" data-i="lWh"></label><input class="sel" id="cWh" type="number" inputmode="decimal" value="2000"></div><div><label for="cSoh" data-i="lSohIn"></label><input class="sel" id="cSoh" type="number" inputmode="decimal" value="91"></div><div><label for="cCons" data-i="lCons"></label><input class="sel" id="cCons" type="number" inputmode="decimal" value="28"></div><div><label for="cWt" data-i="lWt"></label><input class="sel" id="cWt" type="number" inputmode="decimal" value="75"></div><div><label for="cSpd" data-i="lSpd"></label><input class="sel" id="cSpd" type="number" inputmode="decimal" value="20"></div><div><label for="cTer" data-i="lTer"></label><select class="sel" id="cTer"><option value="1" data-i="terF"></option><option value="1.2" data-i="terH"></option><option value="1.4" data-i="terS"></option></select></div><div><label for="cSoc" data-i="lBat"></label><input class="sel" id="cSoc" type="number" inputmode="decimal" value="80"></div><div><label for="cRes" data-i="lRes"></label><input class="sel" id="cRes" type="number" inputmode="decimal" value="10"></div><div><label for="cDist" data-i="lDist"></label><input class="sel" id="cDist" type="number" inputmode="decimal" value=""></div></div></div>
+    <div class="card" id="calcRes" role="status" aria-live="polite"></div>
+    <h2 data-i="hHealth"></h2><div class="card" id="healthBox"></div>
+  </section>
+
+  <section class="scr" id="s-feat" role="tabpanel" aria-labelledby="t-feat" hidden>
+   <div class="chips" id="tabs" role="group" data-a="tabsAria" aria-label="Filter"></div>
+   <div style="margin-top:12px" id="featList"></div>
+  </section>
+
+  <section class="scr" id="s-real" role="tabpanel" aria-labelledby="t-real" hidden>
+   <p class="sub" data-i="realSub"></p>
+   <div id="realList"></div>
+   <p class="note" data-i="realNote"></p>
+  </section>
+
+  <section class="scr" id="s-doubt" role="tabpanel" aria-labelledby="t-doubt" hidden>
+   <p class="sub" data-i="doubtSub"></p>
+   <div class="card">
+    <strong data-i="lCat"></strong>
+    <div class="chips" role="group" data-a="lCat" style="margin:6px 0 12px"><button type="button" data-dc="bat" aria-pressed="true"><span aria-hidden="true">🔋</span> <span data-i="cBat"></span></button><button type="button" data-dc="brk" aria-pressed="false"><span aria-hidden="true">🛑</span> <span data-i="cBrk"></span></button><button type="button" data-dc="spd" aria-pressed="false"><span aria-hidden="true">🚦</span> <span data-i="cSpd"></span></button><button type="button" data-dc="hel" aria-pressed="false"><span aria-hidden="true">⛑️</span> <span data-i="cHel"></span></button><button type="button" data-dc="prk" aria-pressed="false"><span aria-hidden="true">🅿️</span> <span data-i="cPrk"></span></button><button type="button" data-dc="oth" aria-pressed="false"><span aria-hidden="true">❓</span> <span data-i="cOth"></span></button></div>
+    <label for="dTxt"><strong data-i="lProb"></strong></label>
+    <textarea id="dTxt" class="sel" rows="4" maxlength="300"></textarea>
+    <button type="button" class="btn pri" id="dBtn" style="width:100%" data-i="bSend"></button>
+    <div class="msg" id="dMsg" role="status" aria-live="polite" style="margin-top:10px"></div>
+   </div>
+   <h2 data-i="hMine"></h2><div id="doubtMine"></div>
+  </section>
+
+  <section class="scr" id="s-about" role="tabpanel" aria-labelledby="t-about" hidden>
+   <p class="sub" data-i="pitch"></p>
+   <h2 data-i="hProblem"></h2><div id="probList"></div>
+   <h2 data-i="hFlow"></h2>
+   <div role="img" data-a="flowAria" aria-label="Flow">
+    <div class="node" data-i="fl1"></div><div class="node" data-i="fl2"></div><div class="node" data-i="fl3"></div><div class="node" style="margin-bottom:12px" data-i="fl4"></div>
+   </div>
+   <h2 data-i="hRoad"></h2><div id="phaseList"></div>
+   <h2 data-i="hBiz"></h2><div id="bizList"></div>
+   <p class="note"><strong data-i="fTeam"></strong><br><span data-i="fContact"></span>: <a href="mailto:team@example.com" style="color:var(--ac2)">team@example.com</a></p>
+  </section>
+ </main>
+ <nav class="nav" role="tablist" data-a="navAria" aria-label="Main">
+  <button type="button" role="tab" id="t-ride" data-tab="ride" aria-selected="true"><span aria-hidden="true">🛴</span><span data-i="tRide"></span></button>
+  <button type="button" role="tab" id="t-fleet" data-tab="fleet" aria-selected="false"><span aria-hidden="true">🛰️</span><span data-i="tFleet"></span></button>
+  <button type="button" role="tab" id="t-map" data-tab="map" aria-selected="false"><span aria-hidden="true">🗺️</span><span data-i="tMap"></span></button>
+  <button type="button" role="tab" id="t-trip" data-tab="trip" aria-selected="false"><span aria-hidden="true">🔋</span><span data-i="tTrip"></span></button>
+  <button type="button" role="tab" id="t-feat" data-tab="feat" aria-selected="false"><span aria-hidden="true">✨</span><span data-i="tFeat"></span></button>
+  <button type="button" role="tab" id="t-real" data-tab="real" aria-selected="false"><span aria-hidden="true">📊</span><span data-i="tReal"></span></button>
+  <button type="button" role="tab" id="t-doubt" data-tab="doubt" aria-selected="false"><span aria-hidden="true">❓</span><span data-i="tDoubt"></span></button>
+  <button type="button" role="tab" id="t-about" data-tab="about" aria-selected="false"><span aria-hidden="true">ℹ️</span><span data-i="tAbout"></span></button>
+ </nav>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var T = {
+    hi: {
+      tRide: 'राइड', tFeat: 'फ़ीचर', tReal: 'हक़ीक़त', tAbout: 'अबाउट', navAria: 'मुख्य नेविगेशन', tabsAria: 'फ़ीचर फ़िल्टर', tAll: 'सभी',
+      rideSub: 'सतह चुनें और थ्रॉटल बढ़ाएँ। APSI के नियम गति सीमित करेंगे।',
+      sRoad: 'सड़क', sFoot: 'फ़ुटपाथ', sWet: 'गीली सड़क', lThr: 'थ्रॉटल', bReset: 'रीसेट', gaugeAria: 'स्पीडोमीटर', lim: 'सीमा',
+      ds: { road: ['सामान्य','डामर सतह। सामान्य गति से सुरक्षित।'], foot: ['फ़ुटपाथ मिला','फ़ुटपाथ पहचाना गया। गति 5 km/h तक सीमित।'], wet: ['सावधान','फिसलन भरी सड़क! गति घटाई और पीछे के राइडरों को चेतावनी भेजी।'] },
+      sosBtn: '🆘 गिरना सिमुलेट करें', sosCancel: 'मैं ठीक हूँ, रद्द करें', sosWarn: 'गिरना पहचाना गया! {n} सेकंड में इमरजेंसी अलर्ट भेजा जाएगा।', sosSent: 'इमरजेंसी अलर्ट संपर्कों और फ़्लीट को भेज दिया गया।',
+      realSub: 'हर फ़ीचर का लक्ष्य, सीमा और समाधान।', lAcc: 'सटीकता (लक्ष्य)', lLim: 'सीमा', lFix: 'समाधान', realNote: 'ये लक्ष्य-अनुमान हैं, पायलट में सत्यापित होंगे।',
+      reality: [
+        ['ध्वनि सतह AI','80–90%','शोर, फ़ोन की जगह, टायर','मल्टी-सेंसर फ़्यूज़न, शहर-वार ट्यूनिंग'],
+        ['फ़ुटपाथ डिटेक्शन','85–90%','संकरी गलियों में GPS ड्रिफ़्ट','ऑडियो + एक्सेलेरोमीटर + GPS मैप-मैचिंग; edge-first, ऑफ़लाइन भी चले'],
+        ['फिसलन / ब्लैक-आइस','70–80%','बर्फ़ सीधे नहीं मापी जा सकती','क्राउड पुष्टि, मौसम डेटा'],
+        ['क्रैश / फ़ॉल','90–95%','फ़ोन गिरने पर झूठा अलार्म','10 सेकंड कैंसिल विंडो'],
+        ['सेल्फ़ी हेलमेट','90%+','कम रोशनी, स्पूफ़िंग','लाइवनेस, रीट्राई, रैंडम चेक'],
+        ['पार्किंग वेरिफ़िकेशन','90–95%','कोण और रोशनी','गाइडेड कैप्चर, GPS मिलान, मानव समीक्षा'],
+        ['जियोफ़ेंस','GPS 3–10 मी','ऊँची इमारतों में कमज़ोर सिग्नल','मैप-मैचिंग, बफ़र ज़ोन'],
+        ['प्राइवेसी (DPDP Act)','Privacy-by-design','निजी डेटा का जोखिम','ऑन-डिवाइस प्रोसेसिंग, सहमति, न्यूनतम रिटेंशन']
+      ],
+      mods: ['सुरक्षा और राइडर व्यवहार', 'पार्किंग और सिटी गवर्नेंस', 'ऑपरेशंस और एनालिटिक्स'],
+      features: [
+        ['APSI ध्वनि सतह AI','माइक और एक्सेलेरोमीटर से टायर की आवाज़ और कंपन सुनकर डामर, पेवर टाइल और गीली सड़क में फ़र्क़ करता है।'],
+        ['फ़ुटपाथ डिटेक्शन, 5 km/h सीमा','ऑडियो, एक्सेलेरोमीटर और GPS मैप-मैचिंग से फ़ुटपाथ पहचानकर गति 5 km/h तक सीमित।'],
+        ['ब्लैक-आइस / फिसलन अलर्ट','फिसलन मिलने पर राइडर को अलर्ट और पीछे आने वालों को क्राउड-वार्निंग।'],
+        ['सेंसर फ़्यूज़न: रैश, क्रैश, इमरजेंसी','एक्सेलेरोमीटर, जायरो और GPS से ख़तरनाक राइडिंग और गिरना पहचानकर इमरजेंसी अलर्ट।'],
+        ['सेल्फ़ी हेलमेट चेक','राइड से पहले सेल्फ़ी में हेलमेट जाँच, लाइवनेस डिटेक्शन से फ़ोटो-स्पूफ़िंग बंद।'],
+        ['AI पार्किंग फ़ोटो जाँच','राइड के अंत में फ़ोटो: सही जगह, सीधी खड़ी, रास्ता खुला।'],
+        ['वर्चुअल जियोफ़ेंसिंग','स्कूल/अस्पताल के पास स्लो ज़ोन और नो-पार्किंग पर जुर्माना, बिना उपकरण।'],
+        ['चोरी अलर्ट, बैटरी ट्विन, रीलोकेशन इनाम','बिना राइड हिलते वाहन पर अलर्ट, बैटरी की सेहत का मॉडल, सही जगह पहुँचाने पर इनाम।']
+      ],
+      pitch: 'APSI: कोई अतिरिक्त हार्डवेयर नहीं। राइडर का फ़ोन और मौजूदा फ़्लीट टेलीमैटिक्स ही काफ़ी हैं।',
+      hProblem: 'छह रोज़ की दिक़्क़तें',
+      problems: [['🚶','फ़ुटपाथ पर राइडिंग','पैदल यात्रियों के लिए ख़तरा।'],['🌧️','फिसलन भरी सड़कें','गीली सड़क या ब्लैक-आइस पर स्किड।'],['⛑️','बिना हेलमेट','गिरने पर सिर की गंभीर चोट।'],['🅿️','ग़लत पार्किंग','रास्ते और फ़ुटपाथ बंद।'],['🔒','चोरी','वाहन गायब, रिकवरी धीमी।'],['🔋','बैटरी फ़ेल','बीच रास्ते चार्ज ख़त्म।']],
+      hFlow: 'कैसे काम करता है', flowAria: 'फ़ोन सेंसर से ऑन-डिवाइस AI, क्लाउड और फ़्लीट/राइडर ऐप तक',
+      fl1: '📱 फ़ोन सेंसर', fl2: '🧠 ऑन-डिवाइस AI', fl3: '☁️ क्लाउड', fl4: '🚲 फ़्लीट / राइडर ऐप',
+      hRoad: 'रोडमैप',
+      phases: [['🧪','चरण 1: MVP और पायलट','सतह AI, फ़ुटपाथ सीमा और हेलमेट चेक, एक शहर में।'],['🏙️','चरण 2: सिटी इंटीग्रेशन','पार्किंग जाँच, जियोफ़ेंस, क्राउड वार्निंग, नगर निगम डैशबोर्ड।'],['🚀','चरण 3: स्केल','बैटरी ट्विन, चोरी अलर्ट, बीमा, बहु-शहर।']],
+      hBiz: 'इम्पैक्ट और बिज़नेस मॉडल',
+      biz: [['💳','SaaS प्रति वाहन','फ़्लीट ऑपरेटरों से मासिक सब्सक्रिप्शन।'],['🏛️','म्युनिसिपल डेटा लाइसेंस','अनामित रूट और सतह डेटा से शहर की योजना।'],['🤝','बीमा साझेदारी','सुरक्षित राइडिंग पर कम प्रीमियम।']],
+      fTeam: 'टीम का नाम (प्लेसहोल्डर)', fContact: 'संपर्क', langBtn: 'English', langAria: 'Switch language: English'
+    },
+    en: {
+      tRide: 'Ride', tFeat: 'Features', tReal: 'Reality', tAbout: 'About', navAria: 'Main navigation', tabsAria: 'Feature filter', tAll: 'All',
+      rideSub: 'Pick a surface and raise the throttle. APSI rules will cap the speed.',
+      sRoad: 'Road', sFoot: 'Footpath', sWet: 'Wet road', lThr: 'Throttle', bReset: 'Reset', gaugeAria: 'Speedometer', lim: 'limit',
+      ds: { road: ['Normal','Asphalt surface. Safe at normal speed.'], foot: ['Footpath detected','Footpath recognised. Speed limited to 5 km/h.'], wet: ['Caution','Slippery road! Speed reduced and riders behind warned.'] },
+      sosBtn: '🆘 Simulate a fall', sosCancel: 'I\'m OK, cancel', sosWarn: 'Fall detected! Emergency alert will be sent in {n} s.', sosSent: 'Emergency alert sent to contacts and the fleet.',
+      realSub: 'Target, limitation and mitigation for every feature.', lAcc: 'Accuracy (target)', lLim: 'Limitation', lFix: 'Mitigation', realNote: 'These are target estimates, to be validated in pilots.',
+      reality: [
+        ['Acoustic surface AI','80–90%','Noise, phone placement, tyres','Multi-sensor fusion, per-city tuning'],
+        ['Footpath detection','85–90%','GPS drift in narrow lanes','Audio + accelerometer + GPS map-matching; edge-first so it works offline'],
+        ['Slippery / black ice','70–80%','Ice can\'t be measured directly','Crowd confirmation, weather data'],
+        ['Crash / fall','90–95%','False alarm if phone dropped','10-second cancel window'],
+        ['Selfie helmet','90%+','Low light, spoofing','Liveness, retry, random checks'],
+        ['Parking verification','90–95%','Angles and lighting','Guided capture, GPS match, human review'],
+        ['Geofence','GPS 3–10 m','Weak signal near tall buildings','Map-matching, buffer zones'],
+        ['Privacy (DPDP Act)','Privacy-by-design','Personal-data risk','On-device processing, consent, minimal retention']
+      ],
+      mods: ['Safety & Rider Behaviour', 'Parking & City Governance', 'Operations & Analytics'],
+      features: [
+        ['APSI acoustic surface AI','Mic and accelerometer listen to tyre sound and vibration to tell asphalt, paver tiles and wet road apart.'],
+        ['Footpath detection, 5 km/h cap','Audio, accelerometer and GPS map-matching spot footpaths and limit speed to 5 km/h.'],
+        ['Black-ice / slippery alert','Slip signals alert the rider and warn the crowd of riders approaching.'],
+        ['Sensor fusion: rash, crash, emergency','Accelerometer, gyro and GPS detect dangerous riding and falls, then send an emergency alert.'],
+        ['Selfie helmet check','Pre-ride selfie confirms a helmet; liveness detection blocks photo spoofing.'],
+        ['AI parking photo check','End-of-ride photo: right spot, upright, path clear.'],
+        ['Virtual geofencing','School/hospital slow zones and no-parking fines, no devices needed.'],
+        ['Theft alert, battery twin, relocation rewards','Alerts for vehicles moving without a ride, a battery-health model, and rewards for moving vehicles where needed.']
+      ],
+      pitch: 'APSI: no extra hardware. The rider\'s phone and existing fleet telematics are enough.',
+      hProblem: 'Six everyday problems',
+      problems: [['🚶','Footpath riding','Risk to pedestrians.'],['🌧️','Slippery roads','Skids on wet roads or black ice.'],['⛑️','Helmetless riding','Serious head injury in a fall.'],['🅿️','Bad parking','Paths and footpaths blocked.'],['🔒','Theft','Vehicles vanish, slow recovery.'],['🔋','Battery failures','Charge dies mid-trip.']],
+      hFlow: 'How it works', flowAria: 'From phone sensors to on-device AI, cloud and fleet/rider app',
+      fl1: '📱 Phone sensors', fl2: '🧠 On-device AI', fl3: '☁️ Cloud', fl4: '🚲 Fleet / Rider app',
+      hRoad: 'Roadmap',
+      phases: [['🧪','Phase 1: MVP & pilot','Surface AI, footpath cap and helmet checks in one city.'],['🏙️','Phase 2: City integration','Parking checks, geofences, crowd warnings, municipal dashboard.'],['🚀','Phase 3: Scale','Battery twin, theft alerts, insurance, multi-city.']],
+      hBiz: 'Impact & business model',
+      biz: [['💳','SaaS per vehicle','Monthly subscription from fleet operators.'],['🏛️','Municipal data licensing','Anonymised route and surface data for planning.'],['🤝','Insurance partnerships','Lower premiums for safe riding.']],
+      fTeam: 'Team name (placeholder)', fContact: 'Contact', langBtn: 'हिन्दी', langAria: 'भाषा बदलें: हिन्दी'
+    }
+  };
+  var lang = 'hi', surface = 'road', filter = -1, tab = 'ride', open = {}, sosTimer = null, sosLeft = 0;
+  var CAP = { road: 25, foot: 5, wet: 15 };
+  var KIND = { road: '', foot: 'warn', wet: 'warn' };
+  var FI = ['🔊','🚶','🧊','📡','🤳','📸','📍','👻'];
+  var FM = [0,0,0,0,0,1,1,2];
+  var RP = [85,88,75,92,90,92,0,0];
+  Object.assign(T.hi, { tFleet: 'फ़्लीट', fleetSub: 'बैकएंड से लाइव डेटा: वाहन, इवेंट और API कॉल।', hVeh: 'वाहन', hEvt: 'लाइव इवेंट', hApi: 'बैकएंड API लॉग (डेमो, सिम्युलेटेड)', bHelmet: '⛑️ हेलमेट चेक', bPark: '🅿️ पार्किंग चेक', synced: 'क्लाउड से सिंक', apiEmpty: 'अभी कोई कॉल नहीं। राइड टैब में थ्रॉटल हिलाएँ।', stActive: 'सक्रिय वाहन', stCaps: 'गति सीमा लागू', stSos: 'SOS अलर्ट', stRides: 'सत्यापित राइड', sidle: 'खड़ी', sriding: 'चल रही', salert: 'अलर्ट', chkIdle: 'हेलमेट वाली सेल्फ़ी या पार्क की फ़ोटो अपलोड करें (सैंपल लगा है), फिर जाँच चलाएँ।', checking: 'जाँच हो रही है…', helmetOk: 'हेलमेट मिला ({c}%) · राइड अनलॉक', parkOk: 'पार्किंग सही ({c}%) · {z}' });
+  Object.assign(T.en, { tFleet: 'Fleet', fleetSub: 'Live data from the backend: vehicles, events and API calls.', hVeh: 'Vehicles', hEvt: 'Live events', hApi: 'Backend API log (demo, simulated)', bHelmet: '⛑️ Helmet check', bPark: '🅿️ Parking check', synced: 'Synced with cloud', apiEmpty: 'No calls yet. Move the throttle on the Ride tab.', stActive: 'Active vehicles', stCaps: 'Speed caps applied', stSos: 'SOS alerts', stRides: 'Verified rides', sidle: 'Parked', sriding: 'Riding', salert: 'Alert', chkIdle: 'Upload a helmet selfie or a parking photo (samples are loaded), then run the check.', checking: 'Checking…', helmetOk: 'Helmet found ({c}%) · ride unlocked', parkOk: 'Parking OK ({c}%) · {z}' });
+
+  Object.assign(T.hi, { tMap: 'मैप', tTrip: 'ट्रिप', mapSub: 'वाराणसी का डेमो मैप: जहाँ राइडर के सेंसर ने गड्ढे का झटका पकड़ा। डेटा नमूना है।', lgLow: 'हल्का', lgMid: 'मध्यम', lgHigh: 'गंभीर', pDepth: 'गहराई', pRep: 'रिपोर्ट', pSev: 'गंभीरता', pWarn: 'पास के राइडर्स को चेतावनी भेजी गई', bReport: '📍 गड्ढा रिपोर्ट करें (डेमो)', potCount: '{n} गड्ढे · {h} गंभीर', tripSub: 'कहाँ से कहाँ तक, ट्रैफ़िक में कितना रुकेंगे और चार्ज में कितने किमी चलेगी। डेमो डेटा।', lFrom: 'कहाँ से', lTo: 'कहाँ तक', lTraffic: 'ट्रैफ़िक', tLow: 'कम', tMed: 'मध्यम', tHeavy: 'भारी', lSoc: 'अभी चार्ज', rDist: 'दूरी', rRide: 'चलने का समय', rStops: 'ट्रैफ़िक में रुकना', rWait: 'कुल इंतज़ार', rTotal: 'कुल समय', rPot: 'रास्ते में गड्ढे', rUsed: 'बैटरी ख़र्च', rLeft: 'पहुँचकर बैटरी', rRange: 'अभी के चार्ज में चलेगी', rFull: 'फ़ुल चार्ज में चलेगी', min: 'मिनट', times: 'बार', stOk: 'आराम से पहुँच जाएँगे', stLow: 'पहुँचेंगे, बैटरी कम बचेगी', stBad: 'चार्ज कम पड़ेगा', same: 'अलग-अलग जगह चुनें।', hHealth: 'बैटरी हेल्थ और लाइफ', lSoh: 'हेल्थ (SoH)', lCyc: 'चार्ज साइकिल', lLife: 'बची हुई लाइफ', lTemp: 'तापमान', normal: 'सामान्य', cyc: 'साइकिल', mon: 'महीने', lTripCyc: 'इस ट्रिप का असर' });
+  Object.assign(T.en, { tMap: 'Map', tTrip: 'Trip', mapSub: 'Demo map of Varanasi: where riders\' sensors felt a pothole jolt. Sample data.', lgLow: 'Minor', lgMid: 'Medium', lgHigh: 'Severe', pDepth: 'Depth', pRep: 'Reports', pSev: 'Severity', pWarn: 'Nearby riders warned', bReport: '📍 Report a pothole (demo)', potCount: '{n} potholes · {h} severe', tripSub: 'Pick where you start and end, how heavy traffic is, and see waiting time and range on the current charge. Demo data.', lFrom: 'From', lTo: 'To', lTraffic: 'Traffic', tLow: 'Light', tMed: 'Medium', tHeavy: 'Heavy', lSoc: 'Charge now', rDist: 'Distance', rRide: 'Riding time', rStops: 'Traffic stops', rWait: 'Total waiting', rTotal: 'Total time', rPot: 'Potholes on route', rUsed: 'Battery used', rLeft: 'Battery on arrival', rRange: 'Range on current charge', rFull: 'Range on full charge', min: 'min', times: 'stops', stOk: 'You will arrive comfortably', stLow: 'You will arrive, battery low', stBad: 'Not enough charge', same: 'Pick two different places.', hHealth: 'Battery health & life', lSoh: 'Health (SoH)', lCyc: 'Charge cycles', lLife: 'Life remaining', lTemp: 'Temperature', normal: 'Normal', cyc: 'cycles', mon: 'months', lTripCyc: 'Effect of this trip' });
+
+  /* ---- Varanasi demo data: map + trip planner ---- */
+  var LM = [['jn', 'Varanasi Jn', 'वाराणसी जं.', 130, 70], ['raj', 'Rajghat', 'राजघाट', 245, 40], ['god', 'Godowlia', 'गोदौलिया', 215, 170], ['das', 'Dashashwamedh Ghat', 'दशाश्वमेध घाट', 262, 178], ['sig', 'Sigra', 'सिगरा', 150, 230], ['lan', 'Lanka (BHU)', 'लंका (BHU)', 140, 340], ['assi', 'Assi Ghat', 'अस्सी घाट', 232, 395]];
+  var PH = [[175, 115, 3, 'Cantt Road', 'कैंट रोड', 9], [205, 160, 2, 'Godowlia Crossing', 'गोदौलिया चौराहा', 6], [152, 236, 3, 'Sigra Road', 'सिगरा रोड', 8], [148, 285, 1, 'Durgakund Road', 'दुर्गाकुंड रोड', 3], [139, 328, 2, 'Lanka Gate', 'लंका गेट', 5], [188, 378, 3, 'Assi Road', 'अस्सी रोड', 10], [108, 150, 1, 'Maldahiya', 'मालदहिया', 3]];
+  var pick = 0, trf = 1, SOH = 91, CYC = 412, WH = 2000, CP = { c: 28, f: 1, w: 75, v: 20 };
+  function svgEl(tag, a) { var e = document.createElementNS('http://www.w3.org/2000/svg', tag); for (var k in a) { e.setAttribute(k, a[k]); } return e; }
+  function segDist(px, py, ax, ay, bx, by) { var dx = bx - ax, dy = by - ay, l = dx * dx + dy * dy, u = l ? Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / l)) : 0; return Math.hypot(px - ax - u * dx, py - ay - u * dy); }
+  function showPot() {
+    var t = T[lang], p = PH[pick], box = $('potInfo'); if (!box || !p) { return; } clear(box);
+    var L = [t.lgLow, t.lgMid, t.lgHigh][p[2] - 1], c = ['#eab308', '#f97316', '#dc2626'][p[2] - 1];
+    var h = mk('h3', null, '🕳️ ' + p[DEV() ? 4 : 3]); box.appendChild(h); if (p[6]) { var im = mk('img'); im.src = p[6]; im.alt = ''; im.style.cssText = 'width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px;margin:8px 0'; box.appendChild(im); }
+    [[t.pSev, L], [t.pDepth, p[5] + ' cm'], [t.pRep, String(p[2] * 7 + p[5])]].forEach(function (r) { var d = mk('div', 'acc'); d.appendChild(mk('span', null, r[0])); d.appendChild(mk('b', null, r[1])); if (r[0] === t.pSev) { d.lastChild.style.color = c; } box.appendChild(d); });
+    box.appendChild(mk('p', null, '⚠️ ' + t.pWarn));
+    if (p[9]) { box.appendChild(mk('p', null, '📝 ' + p[9])); }
+    var SN = ['open', 'assigned', 'fixed'], si = Math.max(0, SN.indexOf(p[8])), sd = mk('div', 'acc'); sd.appendChild(mk('span', null, t.pStatus)); sd.appendChild(mk('b', null, t['st_' + SN[si]])); box.appendChild(sd);
+    var nb = mk('button', 'btn', t.bNext + ': ' + t['st_' + SN[(si + 1) % 3]]); nb.type = 'button'; nb.style.cssText = 'width:100%;margin-top:8px';
+    nb.addEventListener('click', function () { p[8] = SN[(si + 1) % 3]; addEv('info', 'Pothole status: ' + p[8], 'V-101'); showPot(); }); box.appendChild(nb);
+    var n = PH.length, hi = PH.filter(function (x) { return x[2] === 3; }).length;
+    $('potCount').textContent = t.potCount.replace('{n}', String(n)).replace('{h}', String(hi));
+  }
+  function renderMap() {
+    var g = $('mapPts'); if (!g) { return; } clear(g); var i = DEV() ? 2 : 1;
+    LM.forEach(function (l) { g.appendChild(svgEl('circle', { cx: l[3], cy: l[4], r: 4, fill: '#0f172a' })); var x = svgEl('text', { x: l[3] + 7, y: l[4] + 3, 'font-size': 9.5, fill: '#334155' }); x.textContent = l[i]; g.appendChild(x); });
+    PH.forEach(function (p, k) {
+      var c = ['#eab308', '#f97316', '#dc2626'][p[2] - 1], m = svgEl('g', { tabindex: 0, role: 'button', 'aria-label': p[DEV() ? 4 : 3], style: 'cursor:pointer' });
+      m.appendChild(svgEl('circle', { cx: p[0], cy: p[1], r: 6 + p[2] * 2, fill: c, 'fill-opacity': 0.28 })); m.appendChild(svgEl('circle', { cx: p[0], cy: p[1], r: 5, fill: c, stroke: '#fff', 'stroke-width': 1.5 }));
+      m.addEventListener('click', function () { pick = k; showPot(); });
+      m.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { pick = k; showPot(); } });
+      g.appendChild(m);
+    });
+    showPot();
+  }
+  function fillSel() {
+    ['fromSel', 'toSel', 'repLoc', 'helpLoc'].forEach(function (id, n) { var s = $(id); if (!s) { return; } var cur = s.options.length ? s.selectedIndex : (n ? LM.length - 1 : 0); clear(s); LM.forEach(function (l) { var o = mk('option', null, l[DEV() ? 2 : 1]); s.appendChild(o); }); s.selectedIndex = cur; });
+  }
+  function calcTrip() {
+    var t = T[lang], fs = $('fromSel'), ts = $('toSel'), res = $('tripRes'); if (!fs || !res) { return; } readCP();
+    var A = LM[fs.selectedIndex], B = LM[ts.selectedIndex], soc = Number($('soc').value); $('socVal').textContent = String(soc); clear(res);
+    var d = Math.round(Math.hypot(A[3] - B[3], A[4] - B[4]) * 0.0286 * 10) / 10;
+    if (d < 0.1) { res.appendChild(mk('p', null, t.same)); return; }
+    var R = [[0.6, 20, 22, 1], [1.5, 45, 17, 1.08], [3, 90, 11, 1.18]][trf];
+    var stops = Math.round(d * R[0]), wait = Math.round(stops * R[1] / 60), ride = Math.round(d / R[2] * 60);
+    var pots = PH.filter(function (p) { return segDist(p[0], p[1], A[3], A[4], B[3], B[4]) < 22; }).length;
+    var wh = d * CP.c * CP.f * R[3] + stops * 2 + wait * 0.1 + pots * 1.5, usable = WH * SOH / 100, whkm = wh / d;
+    var used = wh / usable * 100, left = soc - used, range = usable * (soc - 10) / 100 / whkm, k = left >= 25 ? '' : (left >= 10 ? 'warn' : 'bad');
+    var bd = mk('span', 'badge ' + k, left >= 25 ? t.stOk : (left >= 10 ? t.stLow : t.stBad)); res.appendChild(bd);
+    [[t.rDist, d + ' km'], [t.rRide, ride + ' ' + t.min], [t.rStops, stops + ' ' + t.times + ' · ' + R[1] + ' s'], [t.rWait, wait + ' ' + t.min], [t.rTotal, (ride + wait) + ' ' + t.min], [t.rPot, String(pots)], [t.rUsed, used.toFixed(1) + '%'], [t.rEnergy, wh.toFixed(0) + ' Wh'], [t.rLeft, Math.max(0, left).toFixed(0) + '%'], [t.rRange, range.toFixed(0) + ' km'], [t.rFull, (usable / whkm).toFixed(0) + ' km']].forEach(function (r) { var x = mk('div', 'acc'); x.appendChild(mk('span', null, r[0])); x.appendChild(mk('b', null, r[1])); res.appendChild(x); });
+    var hb = $('healthBox'); clear(hb); var deg = (100 - SOH) / CYC, rem = (SOH - 80) / deg, mon = Math.round(rem / 0.8 / 30);
+    var bar = mk('div', 'bar'), f = mk('i'); f.style.width = SOH + '%'; bar.appendChild(f);
+    [[t.lSoh, SOH + '%'], [t.lCyc, CYC + ' ' + t.cyc], [t.lLife, '≈ ' + Math.round(rem) + ' ' + t.cyc + ' · ' + mon + ' ' + t.mon], [t.lTemp, '31 °C · ' + t.normal], [t.lTripCyc, '−' + (used / 100).toFixed(2) + ' ' + t.cyc]].forEach(function (r, n) { var x = mk('div', 'acc'); x.appendChild(mk('span', null, r[0])); x.appendChild(mk('b', null, r[1])); hb.appendChild(x); if (n === 0) { hb.appendChild(bar); } });
+  }
+  function bindTrip() {
+    ['fromSel', 'toSel', 'soc'].forEach(function (id) { $(id).addEventListener('input', calcTrip); });
+    document.querySelectorAll('[data-tr]').forEach(function (b) { b.addEventListener('click', function () { trf = Number(b.getAttribute('data-tr')); document.querySelectorAll('[data-tr]').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); calcTrip(); }); });
+    
+  }
+
+  T.hi.bUp = '📷 फ़ोटो अपलोड'; T.en.bUp = '📷 Upload photo';
+  var SVG = function (x) { return 'data:image/svg+xml,' + encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 180'>" + x + '</svg>'); };
+  var IMG = {
+    helmet: SVG("<rect width='240' height='180' fill='#e0f2fe'/><rect y='142' width='240' height='38' fill='#cbd5e1'/><path d='M55 180q0-50 65-50t65 50z' fill='#2563eb'/><rect x='108' y='108' width='24' height='28' rx='8' fill='#d9a07a'/><ellipse cx='120' cy='84' rx='30' ry='34' fill='#e3b08d'/><path d='M85 82q0-50 35-50t35 50z' fill='#f59e0b'/><rect x='83' y='74' width='74' height='9' rx='4' fill='#d97706'/><circle cx='108' cy='94' r='3' fill='#1e293b'/><circle cx='132' cy='94' r='3' fill='#1e293b'/><path d='M110 108q10 7 20 0' stroke='#7c2d12' stroke-width='3' fill='none'/><path d='M92 84v24M148 84v24' stroke='#92400e' stroke-width='3'/>"),
+    park: SVG("<rect width='240' height='180' fill='#f1f5f9'/><rect y='118' width='240' height='62' fill='#94a3b8'/><path d='M25 176V126M215 176V126M25 176h190' stroke='#fff' stroke-width='4' fill='none'/><circle cx='85' cy='142' r='17' fill='#1e293b'/><circle cx='165' cy='142' r='17' fill='#1e293b'/><circle cx='85' cy='142' r='6' fill='#cbd5e1'/><circle cx='165' cy='142' r='6' fill='#cbd5e1'/><rect x='80' y='128' width='90' height='9' rx='4' fill='#0f9d78'/><path d='M168 132L156 68' stroke='#0f9d78' stroke-width='7' stroke-linecap='round'/><path d='M146 66h26' stroke='#0f172a' stroke-width='7' stroke-linecap='round'/><text x='96' y='123' font-size='9' font-weight='bold' fill='#fff'>APSI</text>")
+  }, FILE = {};
+  function onFile(k, inp) {
+    var f = inp.files && inp.files[0]; if (!f || !/^image\//.test(f.type)) { return; }
+    var r = new FileReader(); r.onload = function () { IMG[k] = r.result; FILE[k] = f.name; $(k + 'Img').src = r.result; $(k + 'Img').alt = f.name; }; r.readAsDataURL(f);
+  }
+  [['helmet', 'helmetFile'], ['park', 'parkFile']].forEach(function (a) { $(a[0] + 'Img').src = IMG[a[0]]; $(a[1]).addEventListener('change', function () { onFile(a[0], this); }); });
+
+  /* ---- Demo backend: in-browser mock REST API (in-memory DB, latency, rules engine) ---- */
+  var V = [['V-101','Your scooter','Campus Gate',82],['V-102','Scooter','Market Road',64],['V-103','E-cycle','Metro Station',91],['V-104','Scooter','Park Lane',23],['V-105','E-cycle','Hospital Zone',57],['V-106','Scooter','Bus Depot',45]].map(function (a) { return { id: a[0], name: a[1], zone: a[2], bat: a[3], spd: 0, st: 'idle' }; });
+  var EV = [], LOG = [], ST = { caps: 128, sos: 2, rides: 1342 }, syncT = null;
+  function addEv(sev, txt, veh, ago) { EV.unshift({ t: new Date(Date.now() - (ago || 0) * 1000), sev: sev, txt: txt, veh: veh }); if (EV.length > 30) { EV.length = 30; } }
+  addEv('info', 'Parking verified (95%) — Bus Depot', 'V-106', 190); addEv('warn', 'Slippery surface — crowd warning sent', 'V-102', 120); addEv('info', 'Footpath detected — speed capped at 5 km/h', 'V-103', 60);
+  var MSG = { foot: 'Footpath detected — speed capped at 5 km/h', wet: 'Slippery surface — speed reduced, crowd warning sent' };
+  function route(p, b) {
+    var v = V[0];
+    if (p === '/api/telemetry') {
+      var cap = CAP[b.surface], sp = Math.min(b.throttle, cap), over = b.throttle > cap, k = b.surface + over;
+      v.spd = sp; v.st = sp > 0 ? 'riding' : 'idle';
+      if (over && v.key !== k) { ST.caps++; addEv(b.surface === 'wet' ? 'warn' : 'info', MSG[b.surface], v.id); }
+      v.key = k; return { status: 'ok', cap: cap, speed: sp, limited: over };
+    }
+    if (p === '/api/sos') {
+      if (b.action === 'trigger') { addEv('warn', 'Fall detected — 10 s cancel window', v.id); }
+      else if (b.action === 'cancel') { addEv('info', 'Fall alert cancelled by rider', v.id); }
+      else { ST.sos++; v.st = 'alert'; v.spd = 0; addEv('crit', 'Emergency alert sent to contacts and fleet ops', v.id); }
+      return { status: 'ok', action: b.action };
+    }
+    if (p === '/api/pothole') { var l = LM[b.loc != null ? b.loc : Math.floor(Math.random() * LM.length)], sv = b.sev || 2; PH.push([l[3] + Math.round(Math.random() * 30 - 15), l[4] + Math.round(Math.random() * 30 - 15), sv, l[1] + ' area', l[2] + ' क्षेत्र', sv * 2 + 1, b.photo || SAMPLE, Date.now(), 'open', b.note || '']); addEv('warn', 'New pothole reported near ' + l[1] + (b.photo ? ' (with photo)' : ' (demo photo)') + ' (jolt 3.8 g)', v.id); return { id: PH.length, severity: ['minor', 'medium', 'severe'][sv - 1], jolt_g: 3.8 }; }
+    if (p === '/api/doubt') { var id = DB.length + 1; DB.push({ id: id, cat: b.cat, txt: b.txt, t: Date.now(), done: false, mine: true }); addEv('warn', 'Rider doubt #' + id + ' (' + b.cat + '): ' + b.txt, v.id); return { id: id, status: 'open' }; }
+    if (p === '/api/sos/trigger') { return sosTrigger(b); }
+    if (p === '/api/sos/accept') { return sosAccept(b); }
+    if (p === '/api/sos/verify') { return sosVerify(b); }
+    if (p === '/api/helmet') { ST.rides++; addEv('info', 'Helmet verified (94%) — ride unlocked', v.id); return { passed: true, confidence: 0.94, liveness: true }; }
+    v.st = 'idle'; v.spd = 0; addEv('info', 'Parking verified (92%) — ' + v.zone, v.id); return { ok: true, confidence: 0.92, zone: v.zone };
+  }
+  function api(m, p, b) {
+    return new Promise(function (res) {
+      var ms = 120 + Math.floor(Math.random() * 180);
+      setTimeout(function () { var d = route(p, b || {}); LOG.unshift({ m: m, p: p, ms: ms, req: b, res: d }); if (LOG.length > 12) { LOG.length = 12; } res({ ms: ms, data: d }); if (tab === 'fleet') { renderFleet(); } }, ms);
+    });
+  }
+  function sync() {
+    clearTimeout(syncT);
+    syncT = setTimeout(function () {
+      api('POST', '/api/telemetry', { vehicle: 'V-101', surface: surface, throttle: Number($('thr').value) }).then(function (r) { var n = $('syncNote'); if (n) { n.textContent = '☁️ ' + T[lang].synced + ' · ' + r.ms + ' ms · cap ' + r.data.cap + ' km/h'; } });
+    }, 350);
+  }
+  function chk(path, key, pk) {
+    var m = $('chkMsg'), t = T[lang]; m.textContent = t.checking;
+    api('POST', path, { vehicle: 'V-101', photo: FILE[pk] || 'sample-' + pk + '.svg' }).then(function (r) { m.textContent = t[key].replace('{c}', String(Math.round(r.data.confidence * 100))).replace('{z}', r.data.zone || ''); });
+  }
+  function renderFleet() {
+    var t = T[lang], box = $('stats'); if (!box) { return; } clear(box);
+    var act = V.filter(function (v) { return v.st !== 'idle'; }).length;
+    [[act + '/' + V.length, t.stActive], [ST.caps, t.stCaps], [ST.sos, t.stSos], [ST.rides, t.stRides]].forEach(function (x) { var d = mk('div', 'stat'); d.appendChild(mk('b', null, String(x[0]))); d.appendChild(mk('span', null, x[1])); box.appendChild(d); });
+    var vl = $('vehList'); clear(vl);
+    V.forEach(function (v) {
+      var c = mk('article', 'card row veh'), m = mk('div', 'm'), bar = mk('div', 'bar'), f = mk('i');
+      m.appendChild(mk('h3', null, v.id + ' · ' + v.name)); m.appendChild(mk('p', null, '📍 ' + v.zone + ' · ' + v.spd + ' km/h · 🔋 ' + v.bat + '%'));
+      f.style.width = v.bat + '%'; if (v.bat < 30) { f.style.background = 'var(--bad)'; } bar.style.margin = '6px 0 0'; bar.appendChild(f); m.appendChild(bar);
+      c.appendChild(icon(/cycle/.test(v.name) ? '🚲' : '🛴')); c.appendChild(m); c.appendChild(mk('span', 'st ' + v.st, t['s' + v.st])); vl.appendChild(c);
+    });
+    var el = $('evtList'); clear(el); var cd = mk('div', 'card');
+    EV.slice(0, 8).forEach(function (e) {
+      var r = mk('div', 'ev'), x = mk('div'); x.appendChild(document.createTextNode(e.txt)); x.appendChild(mk('small', null, e.t.toLocaleTimeString() + ' · ' + e.veh));
+      r.appendChild(mk('i', e.sev === 'info' ? '' : e.sev)); r.appendChild(x); cd.appendChild(r);
+    });
+    el.appendChild(cd);
+    var cl = $('apiLog'); clear(cl); if (!LOG.length) { cl.textContent = t.apiEmpty; }
+    LOG.slice(0, 6).forEach(function (l) { var d = mk('div'); d.appendChild(mk('b', null, l.m + ' ' + l.p + '  200  ' + l.ms + 'ms')); d.appendChild(document.createTextNode('\n→ ' + JSON.stringify(l.req) + '\n← ' + JSON.stringify(l.res))); cl.appendChild(d); });
+  }
+  setInterval(function () {
+    V.slice(1).forEach(function (v) { v.st = Math.random() < 0.6 ? 'riding' : 'idle'; v.spd = v.st === 'riding' ? 5 + Math.floor(Math.random() * 18) : 0; if (v.st === 'riding' && v.bat > 5 && Math.random() < 0.3) { v.bat--; } });
+    if (Math.random() < 0.4) {
+      var v = V[1 + Math.floor(Math.random() * 5)], m = [['info', MSG.foot], ['warn', MSG.wet], ['info', 'Geofence slow zone entered — limit 10 km/h'], ['info', 'Helmet verified (93%) — ride unlocked']][Math.floor(Math.random() * 4)];
+      addEv(m[0], m[1], v.id); if (m[1] === MSG.foot) { ST.caps++; }
+    }
+    if (tab === 'fleet') { renderFleet(); }
+  }, 3000);
+  $('helmetBtn').addEventListener('click', function () { chk('/api/helmet', 'helmetOk', 'helmet'); });
+  $('parkBtn').addEventListener('click', function () { chk('/api/parking', 'parkOk', 'park'); });
+
+  function $(id) { return document.getElementById(id); }
+  function clear(n) { while (n.firstChild) { n.removeChild(n.firstChild); } }
+  function mk(tag, cls, txt) { var e = document.createElement(tag); if (cls) { e.className = cls; } if (txt !== undefined) { e.textContent = txt; } return e; }
+  function icon(t) { var i = mk('div', 'ico', t); i.setAttribute('aria-hidden', 'true'); return i; }
+
+  function renderCards(id, list) {
+    var box = $(id); if (!box) { return; } clear(box);
+    list.forEach(function (it) {
+      var c = mk('article', 'card row'), d = mk('div');
+      d.appendChild(mk('h3', null, it[1])); d.appendChild(mk('p', null, it[2]));
+      c.appendChild(icon(it[0])); c.appendChild(d); box.appendChild(c);
+    });
+  }
+  function renderTabs() {
+    var box = $('tabs'); if (!box) { return; } clear(box);
+    var t = T[lang], names = [t.tAll].concat(t.mods);
+    names.forEach(function (n, k) {
+      var b = mk('button', null, n); b.type = 'button';
+      b.setAttribute('aria-pressed', (k - 1 === filter) ? 'true' : 'false');
+      b.addEventListener('click', function () { filter = k - 1; renderTabs(); renderFeatures(); });
+      box.appendChild(b);
+    });
+  }
+  function renderFeatures() {
+    var box = $('featList'); if (!box) { return; } clear(box);
+    var t = T[lang];
+    t.features.forEach(function (it, i) {
+      if (filter !== -1 && FM[i] !== filter) { return; }
+      var c = mk('article', 'card'), h = mk('h3'), b = mk('button', 'fbtn');
+      b.type = 'button'; b.setAttribute('aria-controls', 'fd' + i);
+      var tt = mk('span', 't'); tt.appendChild(mk('span', 'tag', t.mods[FM[i]])); tt.appendChild(document.createTextNode(it[0]));
+      var ch = mk('span', 'chev', '▾'); ch.setAttribute('aria-hidden', 'true');
+      b.appendChild(icon(FI[i])); b.appendChild(tt); b.appendChild(ch);
+      var p = mk('p', 'fd', it[1]); p.id = 'fd' + i; p.hidden = !open[i];
+      b.setAttribute('aria-expanded', open[i] ? 'true' : 'false');
+      b.addEventListener('click', function () { open[i] = !open[i]; b.setAttribute('aria-expanded', open[i] ? 'true' : 'false'); p.hidden = !open[i]; });
+      h.appendChild(b); c.appendChild(h); c.appendChild(p); box.appendChild(c);
+    });
+  }
+  function renderReality() {
+    var box = $('realList'); if (!box) { return; } clear(box);
+    var t = T[lang];
+    t.reality.forEach(function (r, i) {
+      var c = mk('article', 'card'); c.appendChild(mk('h3', null, r[0]));
+      var a = mk('div', 'acc'); a.appendChild(mk('span', null, t.lAcc)); a.appendChild(mk('b', null, r[1])); c.appendChild(a);
+      if (RP[i]) { var bar = mk('div', 'bar'), f = mk('i'); f.style.width = RP[i] + '%'; bar.appendChild(f); bar.setAttribute('aria-hidden', 'true'); c.appendChild(bar); }
+      var dl = mk('dl');
+      dl.appendChild(mk('dt', null, t.lLim)); dl.appendChild(mk('dd', null, r[2]));
+      dl.appendChild(mk('dt', null, t.lFix)); dl.appendChild(mk('dd', null, r[3]));
+      c.appendChild(dl); box.appendChild(c);
+    });
+  }
+  function updateDemo() {
+    var slider = $('thr'); if (!slider) { return; }
+    var t = T[lang], thr = Number(slider.value), cap = CAP[surface], spd = Math.min(thr, cap), k = KIND[surface];
+    var tv = $('thrVal'), sv = $('spdVal'), gf = $('gf'), bd = $('badge'), ms = $('alertMsg');
+    if (tv) { tv.textContent = String(thr); }
+    if (sv) { sv.textContent = String(spd); }
+    if (gf) { gf.style.strokeDashoffset = String(251.3 * (1 - spd / 30)); gf.setAttribute('class', 'gf ' + k); }
+    if (bd) { bd.textContent = t.ds[surface][0]; bd.className = 'badge ' + k; }
+    if (ms) { ms.textContent = t.ds[surface][1] + (thr > cap ? ' (' + t.lim + ': ' + cap + ' km/h)' : ''); ms.className = 'msg ' + k; }
+    document.querySelectorAll('[data-s]').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-s') === surface ? 'true' : 'false'); });
+  }
+  function updateSos() {
+    var box = $('sosBox'), tx = $('sosTxt'), cb = $('sosCancel'), t = T[lang];
+    if (!box || !tx) { return; }
+    if (sosTimer) { tx.textContent = t.sosWarn.replace('{n}', String(sosLeft)); if (cb) { cb.hidden = false; } box.hidden = false; }
+    else if (sosLeft === -1) { tx.textContent = t.sosSent; if (cb) { cb.hidden = true; } box.hidden = false; }
+    else { box.hidden = true; }
+  }
+  function stopSos() { if (sosTimer) { api('POST', '/api/sos', { action: 'cancel' }); clearInterval(sosTimer); sosTimer = null; } sosLeft = 0; updateSos(); }
+  function startSos() {
+    if (sosTimer) { return; }
+    sosLeft = 10; api('POST', '/api/sos', { action: 'trigger' }); updateSos();
+    sosTimer = setInterval(function () {
+      sosLeft -= 1;
+      if (sosLeft <= 0) { clearInterval(sosTimer); sosTimer = null; sosLeft = -1; api('POST', '/api/sos', { action: 'confirm' }); }
+      updateSos();
+    }, 1000);
+  }
+  function go(name) {
+    tab = name;
+    ['ride', 'fleet', 'map', 'trip', 'feat', 'real', 'doubt', 'about'].forEach(function (k) {
+      var s = $('s-' + k), b = $('t-' + k);
+      if (s) { s.hidden = (k !== name); }
+      if (b) { b.setAttribute('aria-selected', k === name ? 'true' : 'false'); }
+    });
+    var ti = $('title'), t = T[lang];
+    if (ti) { ti.textContent = 'APSI · ' + t['t' + name.charAt(0).toUpperCase() + name.slice(1)]; }
+    if (name === 'fleet') { renderFleet(); }
+    window.scrollTo(0, 0);
+  }
+  function applyLang() {
+    var t = T[lang];
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-i]').forEach(function (n) { var v = t[n.getAttribute('data-i')]; if (typeof v === 'string') { n.textContent = v; } });
+    document.querySelectorAll('[data-a]').forEach(function (n) { var v = t[n.getAttribute('data-a')]; if (typeof v === 'string') { n.setAttribute('aria-label', v); } });
+    var lb = $('langBtn'); if (lb) { lb.textContent = t.langBtn; lb.setAttribute('aria-label', t.langAria); }
+    renderCards('probList', t.problems); renderCards('phaseList', t.phases); renderCards('bizList', t.biz);
+    renderTabs(); renderFeatures(); renderReality(); renderFleet(); renderDoubts(); renderHelp(); renderMap(); fillSel(); calcTrip(); calcBat(); updateDemo(); updateSos(); go(tab);
+  }
+  var lb = $('langBtn');
+  if (lb) { lb.addEventListener('click', function () { lang = (lang === 'hi') ? 'en' : 'hi'; applyLang(); }); }
+  document.querySelectorAll('[data-tab]').forEach(function (b) { b.addEventListener('click', function () { go(b.getAttribute('data-tab')); }); });
+  document.querySelectorAll('[data-s]').forEach(function (b) { b.addEventListener('click', function () { surface = b.getAttribute('data-s'); updateDemo(); sync(); }); });
+  var thr = $('thr'); if (thr) { thr.addEventListener('input', function () { updateDemo(); sync(); }); }
+  var rs = $('resetBtn');
+  if (rs) { rs.addEventListener('click', function () { surface = 'road'; if (thr) { thr.value = '0'; } stopSos(); updateDemo(); sync(); }); }
+  var sb = $('sosBtn'); if (sb) { sb.addEventListener('click', startSos); }
+  var sc = $('sosCancel'); if (sc) { sc.addEventListener('click', stopSos); }
+
+  /* ---- v2: photo report, 4 languages, battery calculator ---- */
+  function DEV() { return lang === 'hi' || lang === 'mr'; }
+  var SAMPLE = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="#8b95a1"/><rect width="400" height="80" fill="#cbd5e1"/><path d="M0 130H400" stroke="#fff" stroke-width="5" stroke-dasharray="28 18"/><ellipse cx="200" cy="205" rx="105" ry="42" fill="#4b5058"/><ellipse cx="206" cy="212" rx="78" ry="28" fill="#23262b"/><ellipse cx="190" cy="205" rx="30" ry="9" fill="#3a3f46"/><text x="200" y="45" font-size="22" font-family="sans-serif" fill="#334155" text-anchor="middle">Sample pothole photo</text></svg>');
+  PH[0][6] = SAMPLE;
+  var repPhoto = null, repSev = 2;
+  function gv(id, def, mn, mx) { var e = $(id), v = e ? parseFloat(e.value) : NaN; return isFinite(v) ? Math.min(mx, Math.max(mn, v)) : def; }
+  function readCP() { WH = gv('cWh', 2000, 100, 20000); SOH = gv('cSoh', 91, 50, 99); CP.c = gv('cCons', 28, 5, 200); CP.w = gv('cWt', 75, 20, 300); CP.v = gv('cSpd', 20, 5, 60); CP.f = (1 + (CP.w - 75) * 0.004) * (1 + 0.015 * (CP.v - 20)) * gv('cTer', 1, 1, 2); }
+  function calcBat() {
+    var t = T[lang], box = $('calcRes'); if (!box) { return; } readCP(); clear(box);
+    var soc = gv('cSoc', 80, 0, 100), res = gv('cRes', 10, 0, 50), dist = gv('cDist', 0, 0, 1000);
+    var whkm = CP.c * CP.f, usable = WH * SOH / 100, range = Math.max(0, usable * (soc - res) / 100 / whkm);
+    var rows = [[t.rRangeNow, range.toFixed(1) + ' km'], [t.rFull, (usable / whkm).toFixed(0) + ' km'], [t.rRide, Math.round(range / CP.v * 60) + ' ' + t.min], [t.lCons, whkm.toFixed(1) + ' Wh/km']];
+    if (dist > 0) {
+      var need = dist * whkm / usable * 100, left = soc - need, k = left >= res + 15 ? '' : (left >= res ? 'warn' : 'bad');
+      box.appendChild(mk('span', 'badge ' + k, left >= res + 15 ? t.stOk : (left >= res ? t.stLow : t.stBad)));
+      rows.push([t.rNeed, need.toFixed(1) + '%'], [t.rLeft, Math.max(0, left).toFixed(0) + '%']);
+    }
+    rows.forEach(function (r) { var x = mk('div', 'acc'); x.appendChild(mk('span', null, r[0])); x.appendChild(mk('b', null, r[1])); box.appendChild(x); });
+  }
+  Object.assign(T.hi, {hRep:'गड्ढा रिपोर्ट करें',bAddPhoto:'📷 फ़ोटो जोड़ें',lWhere:'जगह',lNote:'नोट (वैकल्पिक)',bCsv:'⬇️ कंपनी रिपोर्ट (CSV)',pStatus:'स्थिति',st_open:'खुला',st_assigned:'टीम को सौंपा',st_fixed:'ठीक हुआ',bNext:'अगला',hCalc:'बैटरी रेंज कैलकुलेटर',lWh:'बैटरी क्षमता (Wh)',lSohIn:'बैटरी हेल्थ (%)',lCons:'खपत (Wh/km)',lWt:'राइडर + सामान (kg)',lSpd:'औसत गति (km/h)',lTer:'रास्ता',terF:'सपाट',terH:'चढ़ाई-उतार',terS:'खड़ी चढ़ाई',lBat:'अभी बैटरी (%)',lRes:'रिज़र्व (%)',lDist:'दूरी (km, वैकल्पिक)',rRangeNow:'इतनी बैटरी में चलेगी',rNeed:'इस दूरी के लिए बैटरी',rEnergy:'ऊर्जा ख़र्च'}); Object.assign(T.en, {hRep:'Report a pothole',bAddPhoto:'📷 Add photo',lWhere:'Location',lNote:'Note (optional)',bCsv:'⬇️ Fleet report (CSV)',pStatus:'Status',st_open:'Open',st_assigned:'Assigned',st_fixed:'Fixed',bNext:'Next',hCalc:'Battery range calculator',lWh:'Battery capacity (Wh)',lSohIn:'Battery health (%)',lCons:'Consumption (Wh/km)',lWt:'Rider + load (kg)',lSpd:'Avg speed (km/h)',lTer:'Terrain',terF:'Flat',terH:'Hilly',terS:'Steep',lBat:'Battery now (%)',lRes:'Reserve (%)',lDist:'Trip distance (km, optional)',rRangeNow:'Range on this battery',rNeed:'Battery needed',rEnergy:'Energy used'});
+  T.mr = Object.assign({}, T.hi, {tRide:'राइड',tFleet:'फ्लीट',tMap:'नकाशा',tTrip:'ट्रिप',tFeat:'फीचर्स',tReal:'वास्तव',tAbout:'माहिती',mapSub:'वाराणसीचा डेमो नकाशा: जिथे रायडरच्या सेन्सरने खड्ड्याचा धक्का पकडला. डेटा नमुना आहे.',lgLow:'हलका',lgMid:'मध्यम',lgHigh:'गंभीर',pDepth:'खोली',pRep:'रिपोर्ट',pSev:'तीव्रता',pWarn:'जवळच्या रायडर्सना इशारा पाठवला',bReport:'📍 खड्डा नोंदवा',potCount:'{n} खड्डे · {h} गंभीर',tripSub:'कुठून कुठे, ट्रॅफिकमध्ये किती थांबाल आणि चार्जमध्ये किती किमी चालेल.',lFrom:'कुठून',lTo:'कुठे',lTraffic:'ट्रॅफिक',tLow:'कमी',tMed:'मध्यम',tHeavy:'जास्त',lSoc:'आत्ताचा चार्ज',rDist:'अंतर',rRide:'चालण्याचा वेळ',rStops:'ट्रॅफिकमध्ये थांबा',rWait:'एकूण प्रतीक्षा',rTotal:'एकूण वेळ',rPot:'वाटेतील खड्डे',rUsed:'बॅटरी खर्च',rLeft:'पोहोचल्यावर बॅटरी',rRange:'आत्ताच्या चार्जवर चालेल',rFull:'फुल चार्जवर चालेल',min:'मिनिटे',times:'वेळा',stOk:'आरामात पोहोचाल',stLow:'पोहोचाल, बॅटरी कमी उरेल',stBad:'चार्ज कमी पडेल',same:'वेगवेगळी ठिकाणे निवडा.',hHealth:'बॅटरी हेल्थ आणि आयुष्य',lSoh:'हेल्थ (SoH)',lCyc:'चार्ज सायकल',lLife:'उरलेले आयुष्य',lTemp:'तापमान',normal:'सामान्य',cyc:'सायकल',mon:'महिने',lTripCyc:'या ट्रिपचा परिणाम'}, {hRep:'खड्डा नोंदवा',bAddPhoto:'📷 फोटो जोडा',lWhere:'ठिकाण',lNote:'टीप (ऐच्छिक)',bCsv:'⬇️ कंपनी अहवाल (CSV)',pStatus:'स्थिती',st_open:'उघडे',st_assigned:'टीमकडे सोपवले',st_fixed:'दुरुस्त झाले',bNext:'पुढे',hCalc:'बॅटरी रेंज कॅल्क्युलेटर',lWh:'बॅटरी क्षमता (Wh)',lSohIn:'बॅटरी हेल्थ (%)',lCons:'वापर (Wh/km)',lWt:'रायडर + सामान (kg)',lSpd:'सरासरी वेग (km/h)',lTer:'रस्ता',terF:'सपाट',terH:'चढ-उतार',terS:'तीव्र चढाव',lBat:'आत्ता बॅटरी (%)',lRes:'राखीव (%)',lDist:'अंतर (km, ऐच्छिक)',rRangeNow:'एवढ्या बॅटरीवर चालेल',rNeed:'या अंतरासाठी बॅटरी',rEnergy:'ऊर्जा खर्च'}, { langAria: 'भाषा' });
+  T.bn = Object.assign({}, T.en, {tRide:'রাইড',tFleet:'ফ্লিট',tMap:'ম্যাপ',tTrip:'ট্রিপ',tFeat:'ফিচার',tReal:'বাস্তবতা',tAbout:'সম্পর্কে',mapSub:'বারাণসীর ডেমো ম্যাপ: যেখানে রাইডারের সেন্সর গর্তের ঝাঁকুনি ধরেছে। নমুনা ডেটা।',lgLow:'হালকা',lgMid:'মাঝারি',lgHigh:'গুরুতর',pDepth:'গভীরতা',pRep:'রিপোর্ট',pSev:'গুরুত্ব',pWarn:'কাছের রাইডারদের সতর্কতা পাঠানো হয়েছে',bReport:'📍 গর্ত রিপোর্ট করুন',potCount:'{n}টি গর্ত · {h}টি গুরুতর',tripSub:'কোথা থেকে কোথায়, ট্রাফিকে কতক্ষণ থামবেন এবং চার্জে কত কিমি চলবে।',lFrom:'কোথা থেকে',lTo:'কোথায়',lTraffic:'ট্রাফিক',tLow:'কম',tMed:'মাঝারি',tHeavy:'বেশি',lSoc:'এখনকার চার্জ',rDist:'দূরত্ব',rRide:'চলার সময়',rStops:'ট্রাফিকে থামা',rWait:'মোট অপেক্ষা',rTotal:'মোট সময়',rPot:'পথে গর্ত',rUsed:'ব্যাটারি খরচ',rLeft:'পৌঁছে ব্যাটারি',rRange:'এখনকার চার্জে চলবে',rFull:'ফুল চার্জে চলবে',min:'মিনিট',times:'বার',stOk:'আরামে পৌঁছাবেন',stLow:'পৌঁছাবেন, ব্যাটারি কম থাকবে',stBad:'চার্জ কম পড়বে',same:'দুটি আলাদা জায়গা বেছে নিন।',hHealth:'ব্যাটারি হেলথ ও আয়ু',lSoh:'হেলথ (SoH)',lCyc:'চার্জ সাইকেল',lLife:'বাকি আয়ু',lTemp:'তাপমাত্রা',normal:'স্বাভাবিক',cyc:'সাইকেল',mon:'মাস',lTripCyc:'এই ট্রিপের প্রভাব'}, {hRep:'গর্ত রিপোর্ট করুন',bAddPhoto:'📷 ছবি যোগ করুন',lWhere:'জায়গা',lNote:'নোট (ঐচ্ছিক)',bCsv:'⬇️ কোম্পানি রিপোর্ট (CSV)',pStatus:'অবস্থা',st_open:'খোলা',st_assigned:'টিমকে দেওয়া হয়েছে',st_fixed:'ঠিক হয়েছে',bNext:'পরবর্তী',hCalc:'ব্যাটারি রেঞ্জ ক্যালকুলেটর',lWh:'ব্যাটারির ক্ষমতা (Wh)',lSohIn:'ব্যাটারি হেলথ (%)',lCons:'খরচ (Wh/km)',lWt:'রাইডার + মালপত্র (kg)',lSpd:'গড় গতি (km/h)',lTer:'রাস্তা',terF:'সমতল',terH:'চড়াই-উতরাই',terS:'খাড়া চড়াই',lBat:'এখন ব্যাটারি (%)',lRes:'রিজার্ভ (%)',lDist:'দূরত্ব (km, ঐচ্ছিক)',rRangeNow:'এই ব্যাটারিতে চলবে',rNeed:'এই দূরত্বের জন্য ব্যাটারি',rEnergy:'শক্তি খরচ'}, { langAria: 'ভাষা' });
+  $('repImg').src = SAMPLE;
+  $('repFile').addEventListener('change', function () {
+    var f = this.files[0]; if (!f) { return; } var r = new FileReader();
+    r.onload = function () { var im = new Image(); im.onload = function () { var k = Math.min(1, 640 / Math.max(im.width, im.height)), c = document.createElement('canvas'); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); repPhoto = c.toDataURL('image/jpeg', 0.75); $('repImg').src = repPhoto; }; im.src = r.result; };
+    r.readAsDataURL(f);
+  });
+  document.querySelectorAll('[data-sv]').forEach(function (b) { b.addEventListener('click', function () { repSev = Number(b.getAttribute('data-sv')); document.querySelectorAll('[data-sv]').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); }); });
+  $('repBtn').addEventListener('click', function () {
+    api('POST', '/api/pothole', { vehicle: 'V-101', loc: $('repLoc').selectedIndex, sev: repSev, note: $('repNote').value.slice(0, 80), photo: repPhoto }).then(function () { pick = PH.length - 1; renderMap(); repPhoto = null; $('repImg').src = SAMPLE; $('repNote').value = ''; });
+  });
+  $('csvBtn').addEventListener('click', function () {
+    var rows = [['id', 'area', 'severity', 'depth_cm', 'status', 'note', 'has_photo']];
+    PH.forEach(function (p, i) { rows.push([i + 1, p[3], ['minor', 'medium', 'severe'][p[2] - 1], p[5], p[8] || 'open', String(p[9] || '').replace(/"/g, '""'), p[6] ? 'yes' : 'no']); });
+    var csv = rows.map(function (r) { return r.map(function (c) { return '"' + c + '"'; }).join(','); }).join('\n');
+    var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv' })); a.download = 'potholes.csv'; document.body.appendChild(a); a.click(); a.remove();
+  });
+  ['cWh', 'cSoh', 'cCons', 'cWt', 'cSpd', 'cTer', 'cSoc', 'cRes', 'cDist'].forEach(function (id) { $(id).addEventListener('input', function () { calcTrip(); calcBat(); }); });
+  $('langSel').addEventListener('change', function () { lang = this.value; applyLang(); });
+  
+
+  /* ---- v3: rider Doubt section ---- */
+  var DB = [{ id: 1, cat: 'bat', txt: 'Battery drops fast on slopes', t: Date.now() - 3600000, done: false }, { id: 2, cat: 'hel', txt: 'Helmet check fails at night', t: Date.now() - 1800000, done: false }], dCat = 'bat';
+  Object.assign(T.hi, {"tDoubt": "डाउट", "doubtSub": "राइड में कोई दिक्कत या सवाल है? बताइए, टीम तक पहुँच जाएगा।", "lCat": "किस बारे में", "cBat": "बैटरी", "cBrk": "ब्रेक", "cSpd": "स्पीड लिमिट", "cHel": "हेलमेट चेक", "cPrk": "पार्किंग", "cOth": "कुछ और", "lProb": "अपनी दिक्कत लिखें", "bSend": "📨 डाउट भेजें", "dSent": "डाउट भेज दिया गया। नंबर", "dEmpty": "पहले अपनी दिक्कत लिखें।", "hMine": "आपके डाउट", "hFleetD": "राइडर डाउट", "dNone": "अभी कोई डाउट नहीं।", "dDone": "हल हुआ", "bResolve": "हल हुआ मार्क करें"}); Object.assign(T.en, {"tDoubt": "Doubt", "doubtSub": "Any problem or question while riding? Tell us and the team will see it.", "lCat": "About", "cBat": "Battery", "cBrk": "Brakes", "cSpd": "Speed limit", "cHel": "Helmet check", "cPrk": "Parking", "cOth": "Other", "lProb": "Describe your problem", "bSend": "📨 Send doubt", "dSent": "Doubt sent. Ticket", "dEmpty": "Please describe your problem first.", "hMine": "Your doubts", "hFleetD": "Rider doubts", "dNone": "No doubts yet.", "dDone": "Resolved", "bResolve": "Mark resolved"}); Object.assign(T.mr, {"tDoubt": "शंका", "doubtSub": "राइडमध्ये काही अडचण किंवा प्रश्न आहे? सांगा, टीमपर्यंत पोहोचेल.", "lCat": "कशाबद्दल", "cBat": "बॅटरी", "cBrk": "ब्रेक", "cSpd": "वेग मर्यादा", "cHel": "हेल्मेट चेक", "cPrk": "पार्किंग", "cOth": "इतर", "lProb": "तुमची अडचण लिहा", "bSend": "📨 शंका पाठवा", "dSent": "शंका पाठवली. क्रमांक", "dEmpty": "आधी तुमची अडचण लिहा.", "hMine": "तुमच्या शंका", "hFleetD": "रायडर शंका", "dNone": "अजून शंका नाही.", "dDone": "सुटले", "bResolve": "सुटले म्हणून नोंदवा"}); Object.assign(T.bn, {"tDoubt": "প্রশ্ন", "doubtSub": "রাইডে কোনো সমস্যা বা প্রশ্ন আছে? জানান, টিমের কাছে পৌঁছে যাবে।", "lCat": "কী বিষয়ে", "cBat": "ব্যাটারি", "cBrk": "ব্রেক", "cSpd": "গতিসীমা", "cHel": "হেলমেট চেক", "cPrk": "পার্কিং", "cOth": "অন্যান্য", "lProb": "আপনার সমস্যা লিখুন", "bSend": "📨 প্রশ্ন পাঠান", "dSent": "প্রশ্ন পাঠানো হয়েছে। নম্বর", "dEmpty": "আগে আপনার সমস্যা লিখুন।", "hMine": "আপনার প্রশ্ন", "hFleetD": "রাইডারের প্রশ্ন", "dNone": "এখনও কোনো প্রশ্ন নেই।", "dDone": "সমাধান হয়েছে", "bResolve": "সমাধান হয়েছে চিহ্নিত করুন"});
+  var DCAT = { bat: ['🔋', 'cBat'], brk: ['🛑', 'cBrk'], spd: ['🚦', 'cSpd'], hel: ['⛑️', 'cHel'], prk: ['🅿️', 'cPrk'], oth: ['❓', 'cOth'] };
+  function doubtList(box, items, admin) {
+    var t = T[lang]; if (!box) { return; } clear(box);
+    if (!items.length) { box.appendChild(mk('p', 'sub', t.dNone)); return; }
+    items.forEach(function (d) {
+      var c = mk('div', 'card'); c.appendChild(mk('h3', null, DCAT[d.cat][0] + ' ' + t[DCAT[d.cat][1]] + ' · #' + d.id)); c.appendChild(mk('p', null, d.txt));
+      var r = mk('div', 'acc'); r.appendChild(mk('span', null, new Date(d.t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })));
+      var b = mk('b', null, d.done ? t.dDone : t.st_open); if (d.done) { b.style.color = 'var(--ok)'; } r.appendChild(b); c.appendChild(r);
+      if (admin && !d.done) { var bt = mk('button', 'btn', t.bResolve); bt.type = 'button'; bt.style.cssText = 'width:100%;margin-top:8px'; bt.addEventListener('click', function () { d.done = true; addEv('info', 'Doubt #' + d.id + ' resolved', 'V-101'); renderDoubts(); }); c.appendChild(bt); }
+      box.appendChild(c);
+    });
+  }
+  function renderDoubts() { doubtList($('doubtMine'), DB.filter(function (x) { return x.mine; }), false); doubtList($('doubtFleet'), DB, true); }
+  document.querySelectorAll('[data-dc]').forEach(function (b) { b.addEventListener('click', function () { dCat = b.getAttribute('data-dc'); document.querySelectorAll('[data-dc]').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); }); });
+  $('dBtn').addEventListener('click', function () {
+    var txt = $('dTxt').value.trim(), m = $('dMsg'); if (!txt) { m.textContent = T[lang].dEmpty; return; }
+    api('POST', '/api/doubt', { vehicle: 'V-101', cat: dCat, txt: txt.slice(0, 300) }).then(function (r) { $('dTxt').value = ''; m.textContent = T[lang].dSent + ' #' + r.data.id; renderDoubts(); });
+  });
+  
+
+  /* ---- v4: P2P battery assistance (SOS) demo: mirrors the Node/Mongo backend ---- */
+  var INCENT = 50, REQN = 100, REQ = null, HERR = '', WALLET = 0;
+  Object.assign(T.hi, {"hHelp": "🔋 बैटरी ख़त्म? मदद पाएँ", "helpSub": "पास का खाली राइडर 1 km के अंदर वाले स्वैप स्टेशन से चार्ज बैटरी लाकर आपकी बैटरी बदल देगा।", "lMyLoc": "आपकी लोकेशन", "bHelpBtn": "🆘 बैटरी मदद माँगें", "hNoStn": "1 km के अंदर बैटरी वाला कोई स्वैप स्टेशन नहीं मिला।", "hNoRider": "अभी कोई खाली राइडर नहीं मिला।", "lStation": "स्वैप स्टेशन", "lHelper": "मदद करने वाला राइडर", "lStnDist": "स्टेशन की दूरी", "lEta": "पहुँचने का समय", "lStock": "उपलब्ध बैटरी", "hNotifB": "🔔 राइडर B को नोटिफ़िकेशन", "nB": "{s} के पास एक राइडर को बैटरी स्वैप चाहिए। चार्ज बैटरी उठाकर पहुँचाएँ। इंसेंटिव ₹{i}।", "bAccept": "स्वीकार करें", "bDecline": "मना करें", "bArrived": "मैं पहुँच गया", "lOtpA": "आपका वेरिफ़िकेशन कोड (सिर्फ़ मदद करने वाले को दिखाएँ)", "lOtpB": "राइडर A के फ़ोन का 4-अंक का कोड डालें", "bVerify": "वेरिफ़ाई करें", "oWrong": "गलत कोड। {n} कोशिश बाकी।", "oLocked": "बहुत ज़्यादा गलत कोशिशें। रिक्वेस्ट रद्द।", "hDone": "✅ स्वैप पूरा! राइडर B को ₹{i} इंसेंटिव मिला।", "bNewHelp": "नई रिक्वेस्ट", "lReq": "रिक्वेस्ट", "sPending": "इंतज़ार", "sAccepted": "स्वीकार", "sCompleted": "पूरा", "sCancelled": "रद्द", "lWaitB": "राइडर B के जवाब का इंतज़ार…"}); Object.assign(T.en, {"hHelp": "🔋 Out of battery? Get help", "helpSub": "A nearby idle rider fetches a charged battery from a swap station within 1 km and swaps it for you.", "lMyLoc": "Your location", "bHelpBtn": "🆘 Request battery help", "hNoStn": "No swap station with batteries within 1 km.", "hNoRider": "No idle rider available right now.", "lStation": "Swap station", "lHelper": "Helper rider", "lStnDist": "Station distance", "lEta": "ETA", "lStock": "Batteries available", "hNotifB": "🔔 Notification to Rider B", "nB": "A rider near {s} needs a battery swap. Pick up a charged battery and deliver it. Reward ₹{i}.", "bAccept": "Accept", "bDecline": "Decline", "bArrived": "I've arrived", "lOtpA": "Your verification code (show only to the helper)", "lOtpB": "Enter the 4-digit code from Rider A's phone", "bVerify": "Verify", "oWrong": "Wrong code. {n} tries left.", "oLocked": "Too many wrong attempts. Request cancelled.", "hDone": "✅ Swap complete! Rider B earned ₹{i}.", "bNewHelp": "New request", "lReq": "Request", "sPending": "Pending", "sAccepted": "Accepted", "sCompleted": "Completed", "sCancelled": "Cancelled", "lWaitB": "Waiting for Rider B to respond…"}); Object.assign(T.mr, {"hHelp": "🔋 बॅटरी संपली? मदत मिळवा", "helpSub": "जवळचा रिकामा रायडर 1 km मधील स्वॅप स्टेशनवरून चार्ज बॅटरी आणून तुमची बॅटरी बदलेल.", "lMyLoc": "तुमचे ठिकाण", "bHelpBtn": "🆘 बॅटरी मदत मागा", "hNoStn": "1 km मध्ये बॅटरी असलेले स्वॅप स्टेशन सापडले नाही.", "hNoRider": "सध्या कोणताही रिकामा रायडर नाही.", "lStation": "स्वॅप स्टेशन", "lHelper": "मदत करणारा रायडर", "lStnDist": "स्टेशनचे अंतर", "lEta": "पोहोचण्याची वेळ", "lStock": "उपलब्ध बॅटरी", "hNotifB": "🔔 रायडर B ला नोटिफिकेशन", "nB": "{s} जवळ एका रायडरला बॅटरी स्वॅप हवा आहे. चार्ज बॅटरी घेऊन पोहोचवा. बक्षीस ₹{i}.", "bAccept": "स्वीकारा", "bDecline": "नकार द्या", "bArrived": "मी पोहोचलो", "lOtpA": "तुमचा व्हेरिफिकेशन कोड (फक्त मदतनीसाला दाखवा)", "lOtpB": "रायडर A च्या फोनवरील 4-अंकी कोड टाका", "bVerify": "तपासा", "oWrong": "चुकीचा कोड. {n} प्रयत्न बाकी.", "oLocked": "खूप चुकीचे प्रयत्न. विनंती रद्द.", "hDone": "✅ स्वॅप पूर्ण! रायडर B ला ₹{i} बक्षीस मिळाले.", "bNewHelp": "नवी विनंती", "lReq": "विनंती", "sPending": "प्रतीक्षेत", "sAccepted": "स्वीकारले", "sCompleted": "पूर्ण", "sCancelled": "रद्द", "lWaitB": "रायडर B च्या उत्तराची प्रतीक्षा…"}); Object.assign(T.bn, {"hHelp": "🔋 ব্যাটারি শেষ? সাহায্য নিন", "helpSub": "কাছের ফাঁকা রাইডার ১ কিমির মধ্যে সোয়াপ স্টেশন থেকে চার্জ করা ব্যাটারি এনে বদলে দেবে।", "lMyLoc": "আপনার অবস্থান", "bHelpBtn": "🆘 ব্যাটারি সাহায্য চান", "hNoStn": "১ কিমির মধ্যে ব্যাটারি আছে এমন সোয়াপ স্টেশন পাওয়া যায়নি।", "hNoRider": "এখন কোনো ফাঁকা রাইডার নেই।", "lStation": "সোয়াপ স্টেশন", "lHelper": "সাহায্যকারী রাইডার", "lStnDist": "স্টেশনের দূরত্ব", "lEta": "পৌঁছানোর সময়", "lStock": "উপলব্ধ ব্যাটারি", "hNotifB": "🔔 রাইডার B-কে নোটিফিকেশন", "nB": "{s}-এর কাছে একজন রাইডারের ব্যাটারি বদল দরকার। চার্জ করা ব্যাটারি নিয়ে পৌঁছে দিন। পুরস্কার ₹{i}।", "bAccept": "গ্রহণ করুন", "bDecline": "না করুন", "bArrived": "আমি পৌঁছে গেছি", "lOtpA": "আপনার ভেরিফিকেশন কোড (শুধু সাহায্যকারীকে দেখান)", "lOtpB": "রাইডার A-র ফোনের ৪-সংখ্যার কোড দিন", "bVerify": "যাচাই করুন", "oWrong": "ভুল কোড। আর {n}বার চেষ্টা বাকি।", "oLocked": "অনেকবার ভুল। অনুরোধ বাতিল।", "hDone": "✅ সোয়াপ সম্পূর্ণ! রাইডার B ₹{i} পুরস্কার পেয়েছেন।", "bNewHelp": "নতুন অনুরোধ", "lReq": "অনুরোধ", "sPending": "অপেক্ষমান", "sAccepted": "গ্রহণ করা হয়েছে", "sCompleted": "সম্পূর্ণ", "sCancelled": "বাতিল", "lWaitB": "রাইডার B-র উত্তরের অপেক্ষা…"});
+  var STN = [{ id: 'S1', n: 'Godowlia Hub', x: 213, y: 165, stock: 6 }, { id: 'S2', n: 'Dashashwamedh Swap', x: 255, y: 185, stock: 4 }, { id: 'S3', n: 'Sigra Swap', x: 152, y: 226, stock: 5 }, { id: 'S4', n: 'Lanka Swap (empty)', x: 143, y: 335, stock: 0 }, { id: 'S5', n: 'BHU Gate Swap', x: 150, y: 330, stock: 4 }, { id: 'S6', n: 'Assi Swap', x: 228, y: 390, stock: 3 }, { id: 'S7', n: 'Cantt Hub', x: 128, y: 78, stock: 7 }, { id: 'S8', n: 'Rajghat Swap', x: 240, y: 48, stock: 2 }];
+  var RID = [{ id: 'R1', n: 'Ramesh', x: 190, y: 150, st: 'idle', bat: 82 }, { id: 'R2', n: 'Sunita', x: 232, y: 188, st: 'idle', bat: 64 }, { id: 'R3', n: 'Imran', x: 160, y: 250, st: 'busy', bat: 70 }, { id: 'R4', n: 'Priya', x: 150, y: 320, st: 'idle', bat: 15 }, { id: 'R5', n: 'Arjun', x: 135, y: 90, st: 'idle', bat: 90 }, { id: 'R6', n: 'Meena', x: 250, y: 62, st: 'idle', bat: 76 }, { id: 'R7', n: 'Vikas', x: 145, y: 300, st: 'idle', bat: 55 }, { id: 'R8', n: 'Kiran', x: 222, y: 372, st: 'idle', bat: 48 }];
+  function kmd(ax, ay, bx, by) { return Math.hypot(ax - bx, ay - by) * 0.0286; }
+  function riderFor(st, skip) { /* like $near on Riders: idle, battery >= 20, closest to the station */ return RID.filter(function (r) { return r.st === 'idle' && r.bat >= 20 && skip.indexOf(r.id) < 0; }).map(function (r) { return { r: r, d: kmd(r.x, r.y, st.x, st.y) }; }).sort(function (a, b) { return a.d - b.d; })[0]; }
+  function sosTrigger(b) {
+    if (REQ && (REQ.status === 'pending' || REQ.status === 'accepted')) { return { error: 'busy' }; }
+    var l = LM[b.loc], A = { x: l[3], y: l[4], n: l[1] };
+    var sn = STN.filter(function (x) { return x.stock > 0; }).map(function (x) { return { s: x, d: kmd(A.x, A.y, x.x, x.y) }; }).filter(function (o) { return o.d <= 1; }).sort(function (a, c) { return a.d - c.d; })[0]; /* like $near maxDistance 1000 m */
+    if (!sn) { return { error: 'hNoStn' }; }
+    var rd = riderFor(sn.s, []); if (!rd) { return { error: 'hNoRider' }; }
+    REQ = { id: 'REQ-' + (++REQN), A: A, st: sn.s, sd: sn.d, hp: rd.r, eta: Math.max(1, Math.round((rd.d + sn.d) / 15 * 60)), status: 'pending', otp: String(1000 + Math.floor(Math.random() * 9000)), tries: 3, skip: [], arrived: false };
+    addEv('warn', 'Battery help ' + REQ.id + ': ' + A.n + ' -> ' + sn.s.n + ', notifying ' + rd.r.n, 'V-101');
+    return { requestId: REQ.id, station: sn.s.n, helper: rd.r.n, status: 'pending' };
+  }
+  function sosAccept(b) {
+    if (!REQ || REQ.status !== 'pending') { return { error: 'state' }; }
+    if (b.accept) { REQ.status = 'accepted'; REQ.hp.st = 'busy'; addEv('info', REQ.id + ' accepted by ' + REQ.hp.n, 'V-101'); return { status: 'accepted' }; }
+    REQ.skip.push(REQ.hp.id); var rd = riderFor(REQ.st, REQ.skip);
+    if (!rd) { REQ.status = 'cancelled'; REQ.why = 'hNoRider'; addEv('warn', REQ.id + ' cancelled: no rider', 'V-101'); return { status: 'cancelled' }; }
+    REQ.hp = rd.r; REQ.eta = Math.max(1, Math.round((rd.d + REQ.sd) / 15 * 60)); addEv('info', REQ.id + ' re-matched to ' + rd.r.n, 'V-101'); return { status: 'pending', helper: rd.r.n };
+  }
+  function sosVerify(b) {
+    if (!REQ || REQ.status !== 'accepted') { return { ok: false }; }
+    if (String(b.otp) === REQ.otp) { REQ.status = 'completed'; REQ.st.stock--; REQ.hp.st = 'idle'; REQ.hp.x = REQ.A.x; REQ.hp.y = REQ.A.y; WALLET += INCENT; addEv('info', REQ.id + ' swap verified. Rs ' + INCENT + ' credited to ' + REQ.hp.n, 'V-101'); return { ok: true, incentive: INCENT }; }
+    REQ.tries--; REQ.last = 1;
+    if (REQ.tries <= 0) { REQ.status = 'cancelled'; REQ.why = 'oLocked'; REQ.hp.st = 'idle'; addEv('crit', REQ.id + ' locked: too many wrong OTP attempts', 'V-101'); }
+    return { ok: false, triesLeft: REQ.tries };
+  }
+  function fmtT(str, o) { for (var k in o) { str = str.split('{' + k + '}').join(o[k]); } return str; }
+  function btn(txt, cls, fn) { var b = mk('button', 'btn ' + (cls || ''), txt); b.type = 'button'; b.style.cssText = 'width:100%;margin-top:8px'; b.addEventListener('click', fn); return b; }
+  function renderHelp() {
+    var box = $('helpBox'), t = T[lang]; if (!box) { return; } clear(box);
+    if (HERR) { box.appendChild(mk('div', 'msg', t[HERR] || HERR)); }
+    var R = REQ; if (!R) { return; }
+    var c = mk('div', 'card'); c.appendChild(mk('h3', null, '🆘 ' + t.lReq + ' ' + R.id));
+    var SM = { pending: 'sPending', accepted: 'sAccepted', completed: 'sCompleted', cancelled: 'sCancelled' };
+    c.appendChild(mk('span', 'badge ' + (R.status === 'completed' ? '' : (R.status === 'cancelled' ? 'bad' : 'warn')), t[SM[R.status]]));
+    [[t.lStation, R.st.n], [t.lStnDist, R.sd.toFixed(2) + ' km'], [t.lStock, String(R.st.stock)], [t.lHelper, R.hp.n + ' · ' + t.cBat + ' ' + R.hp.bat + '%'], [t.lEta, R.eta + ' ' + t.min]].forEach(function (r) { var x = mk('div', 'acc'); x.appendChild(mk('span', null, r[0])); x.appendChild(mk('b', null, r[1])); c.appendChild(x); });
+    box.appendChild(c);
+    if (R.status === 'pending') {
+      var n = mk('div', 'card'); n.style.borderColor = 'var(--warn)'; n.appendChild(mk('h3', null, t.hNotifB + ' (' + R.hp.n + ')')); n.appendChild(mk('p', null, fmtT(t.nB, { s: R.st.n, i: INCENT })));
+      n.appendChild(btn(t.bAccept, 'pri', function () { api('POST', '/api/sos/accept', { requestId: R.id, accept: true }).then(renderHelp); }));
+      n.appendChild(btn(t.bDecline, '', function () { api('POST', '/api/sos/accept', { requestId: R.id, accept: false }).then(renderHelp); }));
+      box.appendChild(n);
+    } else if (R.status === 'accepted') {
+      var o = mk('div', 'card'); o.appendChild(mk('p', null, t.lOtpA)); var code = mk('div', null, R.otp.split('').join(' ')); code.style.cssText = 'font-size:2rem;font-weight:800;letter-spacing:.2em;text-align:center;color:var(--ac2);margin:8px 0'; code.setAttribute('aria-label', R.otp.split('').join(' ')); o.appendChild(code); box.appendChild(o);
+      var p = mk('div', 'card'); p.appendChild(mk('h3', null, '🛵 ' + R.hp.n));
+      if (!R.arrived) { p.appendChild(btn(t.bArrived, 'pri', function () { R.arrived = true; renderHelp(); })); }
+      else {
+        p.appendChild(mk('label', null, t.lOtpB)); var inp = mk('input', 'sel'); inp.type = 'text'; inp.inputMode = 'numeric'; inp.maxLength = 4; inp.autocomplete = 'one-time-code'; inp.setAttribute('aria-label', t.lOtpB); p.appendChild(inp);
+        if (R.last) { p.appendChild(mk('div', 'msg', fmtT(t.oWrong, { n: R.tries }))); }
+        p.appendChild(btn(t.bVerify, 'pri', function () { api('POST', '/api/sos/verify', { requestId: R.id, otp: inp.value }).then(renderHelp); }));
+      }
+      box.appendChild(p);
+    } else if (R.status === 'completed') {
+      box.appendChild(mk('div', 'msg', fmtT(t.hDone, { i: INCENT })));
+      box.appendChild(btn(t.bNewHelp, 'pri', function () { REQ = null; HERR = ''; renderHelp(); }));
+    } else {
+      box.appendChild(mk('div', 'msg', t[R.why || 'hNoRider']));
+      box.appendChild(btn(t.bNewHelp, 'pri', function () { REQ = null; HERR = ''; renderHelp(); }));
+    }
+  }
+  $('helpBtn').addEventListener('click', function () {
+    HERR = ''; api('POST', '/api/sos/trigger', { vehicle: 'V-101', loc: $('helpLoc').selectedIndex }).then(function (r) { if (r.data.error && r.data.error !== 'busy') { HERR = r.data.error; REQ = null; } renderHelp(); });
+  });
+  
+  bindTrip(); applyLang(); sync();
+});
+</script>
+</body>
+</html>
